@@ -156,32 +156,7 @@ export default function About() {
           </div>
         </motion.div>
 
-        {/* Call to Action */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          viewport={{ once: true }}
-          className="mt-20 pt-12 border-t border-gray-200"
-        >
-          <h2 className="text-3xl md:text-4xl font-light text-black mb-6">
-            Let's work together!
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Passionate about using data science and machine learning to solve complex problems 
-            and make the world a better place.
-          </p>
-          <a
-            href="#contact"
-            className="inline-flex items-center px-8 py-3 bg-black text-white text-lg font-medium rounded-full hover:bg-gray-800 transition-all duration-200"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-            }}
-          >
-            Get in touch
-          </a>
-        </motion.div>
+       
       </div>
     </section>
   )
