@@ -72,9 +72,247 @@ export default function Hero() {
   const buttonOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
 
   return (
-    <section ref={ref} className="min-h-screen flex flex-col justify-center items-center text-center px-4 relative">
+    <section ref={ref} className="min-h-screen flex flex-col justify-center items-center text-center px-4 relative overflow-hidden">
+      {/* City Road Network with Traffic Flow */}
+      <div className="absolute inset-0 opacity-25 pointer-events-none overflow-hidden">
+        {/* Horizontal Roads */}
+        {Array.from({ length: 8 }, (_, roadIndex) => (
+          <div
+            key={`h-road-${roadIndex}`}
+            className="absolute w-full h-0.5 bg-gray-300"
+            style={{
+              top: `${15 + roadIndex * 12}%`,
+            }}
+          >
+            {/* Traffic on horizontal roads */}
+            {Array.from({ length: 6 }, (_, carIndex) => (
+              <motion.div
+                key={`h-car-${roadIndex}-${carIndex}`}
+                className="absolute text-xs font-mono text-blue-600"
+                style={{
+                  top: '-6px',
+                }}
+                animate={{
+                  x: ['-20px', '100vw'],
+                }}
+                transition={{
+                  duration: 8 + Math.random() * 6,
+                  repeat: Infinity,
+                  delay: carIndex * (2 + Math.random() * 3),
+                  ease: "linear",
+                }}
+              >
+                {['→', '▶', '►', '⟶'][Math.floor(Math.random() * 4)]}
+              </motion.div>
+            ))}
+          </div>
+        ))}
+
+        {/* Vertical Roads */}
+        {Array.from({ length: 10 }, (_, roadIndex) => (
+          <div
+            key={`v-road-${roadIndex}`}
+            className="absolute h-full w-0.5 bg-gray-300"
+            style={{
+              left: `${10 + roadIndex * 9}%`,
+            }}
+          >
+            {/* Traffic on vertical roads */}
+            {Array.from({ length: 4 }, (_, carIndex) => (
+              <motion.div
+                key={`v-car-${roadIndex}-${carIndex}`}
+                className="absolute text-xs font-mono text-green-600"
+                style={{
+                  left: '-6px',
+                }}
+                animate={{
+                  y: ['-20px', '100vh'],
+                }}
+                transition={{
+                  duration: 10 + Math.random() * 8,
+                  repeat: Infinity,
+                  delay: carIndex * (3 + Math.random() * 4),
+                  ease: "linear",
+                }}
+              >
+                {['↓', '▼', '⇓', '⟱'][Math.floor(Math.random() * 4)]}
+              </motion.div>
+            ))}
+          </div>
+        ))}
+
+        {/* Intersections */}
+        {Array.from({ length: 8 }, (_, hIndex) =>
+          Array.from({ length: 10 }, (_, vIndex) => (
+            <motion.div
+              key={`intersection-${hIndex}-${vIndex}`}
+              className="absolute w-2 h-2 bg-gray-400 rounded-full"
+              style={{
+                left: `${10 + vIndex * 9}%`,
+                top: `${15 + hIndex * 12}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 4 + Math.random() * 4,
+                repeat: Infinity,
+                delay: (hIndex + vIndex) * 0.5,
+              }}
+            />
+          ))
+        )}
+
+        {/* Traffic Lights */}
+        {Array.from({ length: 12 }, (_, i) => (
+          <motion.div
+            key={`traffic-light-${i}`}
+            className="absolute text-sm font-mono"
+            style={{
+              left: `${15 + (i * 8)}%`,
+              top: `${20 + (i % 4) * 20}%`,
+            }}
+            animate={{
+              color: ['#ef4444', '#eab308', '#22c55e', '#22c55e', '#eab308'],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              delay: i * 1.5,
+            }}
+          >
+            ●
+          </motion.div>
+        ))}
+
+        {/* Buildings (ASCII) */}
+        {Array.from({ length: 20 }, (_, i) => (
+          <div
+            key={`building-${i}`}
+            className="absolute text-xs font-mono text-gray-500 leading-tight"
+            style={{
+              left: `${5 + (i * 4.5)}%`,
+              top: `${10 + (i % 3) * 30}%`,
+              width: '20px',
+            }}
+          >
+            <motion.div
+              animate={{
+                opacity: [0.4, 0.7, 0.4],
+              }}
+              transition={{
+                duration: 6 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 3,
+              }}
+            >
+              <div>┌─┐</div>
+              <div>│ │</div>
+              <div>│ │</div>
+              <div>└─┘</div>
+            </motion.div>
+          </div>
+        ))}
+
+        {/* Highway Signs */}
+        {Array.from({ length: 6 }, (_, i) => (
+          <motion.div
+            key={`sign-${i}`}
+            className="absolute text-xs font-mono text-gray-600"
+            style={{
+              left: `${20 + i * 15}%`,
+              top: `${8 + (i % 2) * 35}%`,
+            }}
+            animate={{
+              opacity: [0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              delay: i * 2,
+            }}
+          >
+            <div className="bg-green-200/20 px-1 py-0.5 rounded text-[10px]">
+              {['DATA ST', 'ML AVE', 'AI BLVD', 'TECH HWY', 'CODE ST', 'ALGO RD'][i]}
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Emergency Vehicles */}
+        {Array.from({ length: 3 }, (_, i) => (
+          <motion.div
+            key={`emergency-${i}`}
+            className="absolute text-sm font-mono text-red-500"
+            style={{
+              top: `${25 + i * 25}%`,
+            }}
+            animate={{
+              x: ['-50px', '100vw'],
+              opacity: [0, 1, 1, 1, 0],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              delay: i * 8 + Math.random() * 10,
+              ease: "easeInOut",
+            }}
+          >
+            🚑
+          </motion.div>
+        ))}
+
+        {/* Traffic Density Indicators */}
+        {Array.from({ length: 15 }, (_, i) => (
+          <motion.div
+            key={`density-${i}`}
+            className="absolute text-xs font-mono"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              opacity: [0.2, 0.6, 0.2],
+              scale: [0.8, 1.2, 0.8],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 3,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+            }}
+          >
+            <span className="text-yellow-500">
+              {['▪', '▫', '□', '■'][Math.floor(Math.random() * 4)]}
+            </span>
+          </motion.div>
+        ))}
+
+        {/* Data Flow Streams (representing network traffic) */}
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: `repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 10px,
+              rgba(59, 130, 246, 0.05) 10px,
+              rgba(59, 130, 246, 0.05) 20px
+            )`,
+          }}
+          animate={{
+            backgroundPosition: ['0px 0px', '40px 40px'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      </div>
+
       {/* Logo and Copyright */}
-<div className="absolute top-6 left-6 flex items-center space-x-3">
+<div className="absolute top-6 left-6 flex items-center space-x-3 z-10">
   <svg width="280" height="50" viewBox="0 0 280 100" xmlns="http://www.w3.org/2000/svg">
     <style>
        {`
@@ -113,10 +351,15 @@ export default function Hero() {
         </button>
       </div>
 
-      <div className="max-w-4xl">
+      <div className="max-w-4xl relative">
+        {/* Background blur overlay that blurs the roads behind text */}
+        <div className="absolute inset-0 backdrop-blur-[2px] opacity-80 pointer-events-none"></div>
+        
         <h1
-          className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight mb-8 tracking-tight"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          className="text-5xl md:text-6xl lg:text-7xl font-light leading-tight mb-8 tracking-tight relative z-10"
+          style={{ 
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}
         >
           <div className="mb-2">
             <AnimatedText 
@@ -138,8 +381,10 @@ export default function Hero() {
         </h1>
         
         <p
-          className="text-2xl md:text-3xl text-black mb-4 font-bold tracking-wide"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          className="text-2xl md:text-3xl text-black mb-4 font-bold tracking-wide relative z-10"
+          style={{ 
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}
         >
           <AnimatedText 
             text="rohith teja" 
@@ -147,8 +392,10 @@ export default function Hero() {
         </p>
         
         <p
-          className="text-md md:text-lg text-gray-600 mb-12 font-medium tracking-wide"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          className="text-base md:text-lg text-gray-600 mb-12 font-medium tracking-wide relative z-10"
+          style={{ 
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}
         >
           <AnimatedText 
             text="{ your friendly neighborhood data scientist }" 
