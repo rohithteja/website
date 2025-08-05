@@ -56,7 +56,7 @@ export default function Work() {
     
     // Calculate 35th percentile (bottom 35% = low) and 70th percentile (top 30% = high)
     const percentile35Index = Math.floor(sortedCO2.length * 0.35);
-    const percentile70Index = Math.floor(sortedCO2.length * 0.70);
+    const percentile70Index = Math.floor(sortedCO2.length * 0.75);
     
     const lowThreshold = sortedCO2[percentile35Index];
     const highThreshold = sortedCO2[percentile70Index];
@@ -98,8 +98,12 @@ export default function Work() {
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
           my work
           </h1>
-          <h2 className="text-5xl font-light text-white mb-4">i estimate CO₂ emissions from city traffic</h2>
-          <p className="text-gray-300 text-lg">study on Indian cities (display purposes only, values can be inaccurate)</p>
+          <h2 className="text-5xl font-light text-white mb-4">i estimate CO₂ emissions</h2>
+          <h2 className="text-5xl font-light text-white mb-4">i build interpretable ML models</h2>
+          <h2 className="text-5xl font-light text-white mb-4">i craft interactive visualizations</h2>
+          <h2 className="text-5xl font-light text-white mb-4">simply put, i reshape complexity into clarity</h2>
+            <div className="w-full h-px bg-gray-700 my-6" />
+          <p className="text-5xl font-light text-white mb-4">check this dashboard i made:</p>
         </div>
 
         {/* Stats Cards */}
@@ -160,7 +164,7 @@ export default function Work() {
               {/* Legend */}
               <div className="mt-4 flex items-center justify-between text-sm text-gray-300">
                 <div className="flex items-center space-x-4">
-                  <span>CO2 Emissions:</span>
+                  <span>CO₂ Emissions:</span>
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     <span>Low</span>
@@ -181,7 +185,7 @@ export default function Work() {
           <div className="lg:col-span-1">
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 h-fit">
               <h3 className="text-white text-lg font-semibold mb-4">
-                {selectedCity ? `${selectedCity.city} Details` : 'City Information'}
+                {selectedCity ? `Emission Details` : 'City Information'}
               </h3>
               {selectedCity ? (
                 <div className="space-y-3 text-sm">
