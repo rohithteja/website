@@ -5,7 +5,8 @@ import { motion } from 'framer-motion'
 import Hero from '@/components/Hero'
 import About from '@/components/About'
 import Work from '@/components/Work'
-import Projects from '@/components/Projects'
+import Articles from '@/components/Articles'
+import Publications from '@/components/Publications'
 import Skills from '@/components/Skills'
 import Contact from '@/components/Contact'
 import CustomCursor from '@/components/CustomCursor'
@@ -31,7 +32,8 @@ export default function Home() {
         <Hero />
         <About />
         <Work />
-        <Projects />
+        <Articles />
+        <Publications />
         <Skills />
         <Contact />
       </motion.div>

@@ -83,7 +83,7 @@ export default function About() {
                     <li>Bioinformatics</li>
                     <li>Telecommunications</li>
                     <li>Network Analysis</li>
-                     <li>Tbh any domain with data</li>
+                     <li>Tbf any domain with data</li>
 
                   </ul>
                 </div>

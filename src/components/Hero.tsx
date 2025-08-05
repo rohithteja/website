@@ -26,6 +26,10 @@ export default function Hero() {
     document.getElementById('articles')?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const scrollToPublications = () => {
+    document.getElementById('publications')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   // Function to split text into animated letters
   const AnimatedText = ({ text, delay = 0, className = "" }: { text: string, delay?: number, className?: string }) => {
     return (
@@ -352,6 +356,13 @@ export default function Hero() {
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Articles
+        </button>
+        <button
+          onClick={scrollToPublications}
+          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+        >
+          Publications
         </button>
         <button
           onClick={scrollToContact}

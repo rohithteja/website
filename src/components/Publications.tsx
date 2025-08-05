@@ -5,69 +5,75 @@ import { motion } from 'framer-motion'
 const featuredWork = [
   {
     id: "01",
-    title: "NFT Collection Generator: Data Science Meets Blockchain",
-    description: "A comprehensive Python tool that revolutionizes NFT creation using advanced data science techniques. This project gained significant traction with over 10K views on Medium, demonstrating how traditional data analysis can enhance blockchain applications.",
-    category: "Article & Tool",
-    tech: ["Python", "Data Science", "NFT", "Blockchain", "Medium"],
-    year: "2022",
-    link: "https://medium.com/@rohithtejam",
-    type: "publication"
+    title: "Dynamic Graph Neural Networks for Urban Traffic Prediction",
+    description: "A comprehensive study on applying dynamic graph neural networks to predict traffic patterns in urban environments. This research introduces novel architectures for handling temporal graph data with real-world applications.",
+    category: "Conference Paper",
+    tech: ["Graph Neural Networks", "Urban Analytics", "Deep Learning", "Python"],
+    year: "2024",
+    link: "#",
+    type: "publication",
+    venue: "IEEE Conference on Urban Computing"
   },
   {
     id: "02",
-    title: "Knowledge Graph Embeddings Simplified",
-    description: "An in-depth exploration of knowledge graph embedding techniques, making complex theoretical concepts accessible through practical implementation. This piece bridges the gap between academic research and real-world applications.",
-    category: "Research Article",
-    tech: ["Graph Neural Networks", "Knowledge Graphs", "PyTorch", "Machine Learning"],
-    year: "2022",
-    link: "https://medium.com/@rohithtejam",
-    type: "publication"
+    title: "Knowledge Graph Embeddings for Biological Network Analysis",
+    description: "Novel approaches to embedding biological networks using knowledge graph techniques. This work demonstrates improved performance in protein-protein interaction prediction and drug discovery applications.",
+    category: "Journal Article",
+    tech: ["Knowledge Graphs", "Bioinformatics", "Machine Learning", "Network Analysis"],
+    year: "2023",
+    link: "#",
+    type: "publication",
+    venue: "Bioinformatics Journal"
   },
   {
     id: "03",
-    title: "Dynamic Graph Analysis in Bioinformatics",
-    description: "Pioneering research on dynamic graph structures applied to protein analysis and social networks. This work demonstrates how temporal network changes can reveal hidden patterns in biological systems.",
-    category: "Research Project",
-    tech: ["Dynamic Graphs", "Network Analysis", "Bioinformatics", "Python"],
-    year: "2021",
+    title: "Climate Data Mining: Patterns and Predictions",
+    description: "Large-scale analysis of climate datasets using advanced data mining techniques. This research provides insights into climate patterns and develops predictive models for environmental forecasting.",
+    category: "Research Paper",
+    tech: ["Climate Science", "Data Mining", "Time Series Analysis", "R"],
+    year: "2023",
     link: "#",
-    type: "research"
+    type: "publication",
+    venue: "Environmental Data Science"
   },
   {
     id: "04",
-    title: "AI Fairness & Bias Detection Framework",
-    description: "A comprehensive investigation into bias detection methodologies and fairness optimization techniques in machine learning models, with practical applications across multiple domains.",
-    category: "Research & Ethics",
-    tech: ["AI Ethics", "Bias Detection", "Machine Learning", "Statistical Analysis"],
-    year: "2021",
+    title: "Fairness-Aware Machine Learning in Healthcare",
+    description: "Investigation of bias detection and mitigation strategies in healthcare ML applications. This work addresses ethical considerations and provides frameworks for fair algorithmic decision-making.",
+    category: "Conference Paper",
+    tech: ["AI Ethics", "Healthcare", "Bias Detection", "Machine Learning"],
+    year: "2022",
     link: "#",
-    type: "research"
+    type: "publication",
+    venue: "ACM Conference on AI Ethics"
   },
   {
     id: "05",
-    title: "Graph Neural Network Libraries: A Developer's Guide",
-    description: "An extensive comparison and tutorial covering the most popular GNN libraries for Python developers. This comprehensive guide helps practitioners choose the right tools for their graph-based projects.",
-    category: "Tutorial Article",
-    tech: ["PyTorch Geometric", "DGL", "Graph Networks", "Python"],
-    year: "2021",
-    link: "https://medium.com/@rohithtejam",
-    type: "publication"
+    title: "Scalable Graph Algorithms for Social Network Analysis",
+    description: "Development of efficient algorithms for large-scale social network analysis. This research introduces novel approaches to community detection and influence maximization in massive networks.",
+    category: "Journal Article",
+    tech: ["Social Networks", "Graph Algorithms", "Scalability", "Python"],
+    year: "2022",
+    link: "#",
+    type: "publication",
+    venue: "Journal of Complex Networks"
   },
   {
     id: "06",
-    title: "Climate Change Predictive Analytics Platform",
-    description: "Large-scale environmental data processing and predictive modeling system for climate research institutions. This platform processes vast amounts of environmental data to provide actionable insights for climate scientists.",
-    category: "Industry Project",
-    tech: ["Climate Science", "Time Series", "Data Mining", "R", "Python"],
-    year: "2023",
+    title: "Federated Learning for Environmental Monitoring",
+    description: "Privacy-preserving machine learning approaches for distributed environmental sensing networks. This work enables collaborative learning while maintaining data privacy across multiple institutions.",
+    category: "Workshop Paper",
+    tech: ["Federated Learning", "Environmental Science", "Privacy", "Distributed Systems"],
+    year: "2021",
     link: "#",
-    type: "project"
+    type: "publication",
+    venue: "ICML Workshop on Federated Learning"
   }
 ]
 
-export default function Projects() {
+export default function Publications() {
   return (
-    <section id="articles" className="py-24 px-6 bg-gray-50">
+    <section id="publications" className="py-24 px-6 bg-gray-50">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -80,10 +86,10 @@ export default function Projects() {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
-          i write
+          publications
           </h1>
               <p className="text-4xl text-gray-600 max-w-2xl">
-                on all things data science!
+                research papers & academic work
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -108,7 +114,7 @@ export default function Projects() {
                 <div className="grid lg:grid-cols-12 gap-8 items-start">
                   {/* Left Column - Metadata */}
                   <div className="lg:col-span-3">
-                    <div className="space-y-4">
+                                          <div className="space-y-4">
                       <div className="flex items-center gap-4">
                         <span className="text-3xl font-light text-gray-400 font-mono">{work.id}</span>
                         <span className="text-sm text-gray-500 font-mono">{work.year}</span>
@@ -119,6 +125,14 @@ export default function Projects() {
                           {work.category}
                         </span>
                       </div>
+
+                      {work.venue && (
+                        <div>
+                          <span className="text-xs text-gray-600 font-medium">
+                            {work.venue}
+                          </span>
+                        </div>
+                      )}
 
                       <div className="flex flex-wrap gap-2">
                         {work.tech.slice(0, 3).map((tech) => (
@@ -170,7 +184,7 @@ export default function Projects() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-sm text-black hover:text-gray-600 transition-colors group/link"
                           >
-                            {work.type === "publication" ? "Read Article" : "View Project"}
+                            {work.type === "publication" ? "Read Paper" : "View Publication"}
                             <svg 
                               className="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform" 
                               fill="none" 
@@ -200,11 +214,11 @@ export default function Projects() {
         >
           <div className="bg-black text-white rounded-2xl p-12">
             <h3 className="text-3xl md:text-4xl font-light mb-6">
-              Interested in collaborating?
+              Interested in research collaboration?
             </h3>
             <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              I'm always open to discussing new projects, research opportunities, 
-              or innovative ways to apply data science to complex challenges.
+              I'm always open to discussing new research opportunities, 
+              collaborative projects, or innovative applications of data science in academia.
             </p>
             <a
               href="#contact"
