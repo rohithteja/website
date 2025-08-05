@@ -6,7 +6,7 @@ import Image from 'next/image'
 export default function About() {
   return (
     <section id="about" className="py-24 px-6 bg-white">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Large Heading */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

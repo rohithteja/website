@@ -68,7 +68,7 @@ const featuredWork = [
 export default function Projects() {
   return (
     <section id="articles" className="py-24 px-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -79,12 +79,11 @@ export default function Projects() {
         >
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-light text-black leading-none mb-6">
-                Selected Work
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl">
-                A curated collection of research, articles, and projects spanning data science, 
-                machine learning, and complex systems analysis.
+            <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
+          i write
+          </h1>
+              <p className="text-4xl text-gray-600 max-w-2xl">
+                on all things data science!
               </p>
             </div>
             <div className="flex items-center gap-4">
