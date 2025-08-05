@@ -63,7 +63,7 @@ export default function Work() {
 
   const getCircleRadius = (population: number) => {
     const maxPop = Math.max(...cityData.map(city => city.population_2020));
-    return Math.max(3, (population / maxPop) * 15);
+    return Math.max(6, (population / maxPop) * 15);
   };
 
   const formatNumber = (num: number) => {
@@ -86,11 +86,15 @@ export default function Work() {
 
   return (
     <section id="work" className="bg-gray-900 w-full min-h-screen p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
+
         <div className="mb-8">
-          <h2 className="text-4xl font-bold text-white mb-4">India Cities Traffic Emissions Dashboard</h2>
-          <p className="text-gray-300 text-lg">Interactive map showing CO2 emissions from traffic across major Indian cities</p>
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
+          my work
+          </h1>
+          <h2 className="text-5xl font-light text-white mb-4">i estimate CO2 emissions from city traffic</h2>
+          <p className="text-gray-300 text-lg">study on Indian cities (display purposes only, values can be inaccurate)</p>
         </div>
 
         {/* Stats Cards */}
@@ -117,7 +121,7 @@ export default function Work() {
           {/* Map */}
           <div className="lg:col-span-2">
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-              <h3 className="text-white text-lg font-semibold mb-4">Cities Map</h3>
+              <h3 className="text-white text-lg font-semibold mb-4">Interactive Map</h3>
               <div className="h-96 rounded-lg overflow-hidden">
                 <MapContainer 
                   center={[22.5, 78.9]} 
