@@ -51,14 +51,19 @@ export default function Work() {
   }, []);
 
   const getCircleColor = (co2: number) => {
-    const maxCO2 = Math.max(...cityData.map(city => city.co2));
-    const intensity = co2 / maxCO2;
+    // Sort CO2 values to find percentiles
+    const sortedCO2 = cityData.map(city => city.co2).sort((a, b) => a - b);
     
-    if (intensity > 0.8) return '#ef4444'; // red
-    if (intensity > 0.6) return '#f97316'; // orange
-    if (intensity > 0.4) return '#eab308'; // yellow
-    if (intensity > 0.2) return '#22d3ee'; // cyan
-    return '#10b981'; // green
+    // Calculate 35th percentile (bottom 35% = low) and 70th percentile (top 30% = high)
+    const percentile35Index = Math.floor(sortedCO2.length * 0.35);
+    const percentile70Index = Math.floor(sortedCO2.length * 0.70);
+    
+    const lowThreshold = sortedCO2[percentile35Index];
+    const highThreshold = sortedCO2[percentile70Index];
+    
+    if (co2 > highThreshold) return '#dc2626'; // bright red - high (top 30%)
+    if (co2 > lowThreshold) return '#f59e0b'; // amber/yellow - medium (35th-70th percentile)
+    return '#10b981'; // green - low (bottom 35%)
   };
 
   const getCircleRadius = (population: number) => {
@@ -73,8 +78,8 @@ export default function Work() {
   };
 
   const totalCO2 = cityData.reduce((sum, city) => sum + city.co2, 0);
-  const avgCO2 = cityData.length > 0 ? totalCO2 / cityData.length : 0;
   const totalPopulation = cityData.reduce((sum, city) => sum + city.population_2020, 0);
+  const perCapitaCO2 = totalPopulation > 0 ? totalCO2 / totalPopulation : 0;
 
   if (loading) {
     return (
@@ -108,8 +113,8 @@ export default function Work() {
             <p className="text-2xl font-bold text-red-400">{formatNumber(totalCO2)} tons/year</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <h3 className="text-gray-400 text-sm font-medium">Average CO₂ per City</h3>
-            <p className="text-2xl font-bold text-orange-400">{formatNumber(avgCO2)} tons/year</p>
+            <h3 className="text-gray-400 text-sm font-medium">Per Capita CO₂ Emissions</h3>
+            <p className="text-2xl font-bold text-orange-400">{perCapitaCO2.toFixed(2)} tons/person/year</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <h3 className="text-gray-400 text-sm font-medium">Total Population</h3>
@@ -159,14 +164,10 @@ export default function Work() {
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     <span>Low</span>
-                    <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
-                    <span>Medium</span>
                     <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <span>Medium</span>
+                    <div className="w-3 h-3 rounded-full bg-red-600"></div>
                     <span>High</span>
-                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                    <span>Very High</span>
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <span>Extreme</span>
                   </div>
                 </div>
                 <div>
@@ -199,6 +200,10 @@ export default function Work() {
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-gray-400">CO₂ Emissions:</span>
                     <span className="text-red-400 font-medium">{formatNumber(selectedCity.co2)} tons/year</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <span className="text-gray-400">Per Capita CO₂:</span>
+                    <span className="text-orange-400 font-medium">{(selectedCity.co2 / selectedCity.population_2020).toFixed(2)} tons/person/year</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-gray-400">GDP (2020):</span>
