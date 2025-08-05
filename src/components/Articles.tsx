@@ -1,67 +1,62 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const articles = [
   {
     id: "01",
-    title: "NFT Collection Generator: Data Science Meets Blockchain",
-    description: "A comprehensive Python tool that revolutionizes NFT creation using advanced data science techniques. This project gained significant traction with over 10K views.",
-    category: "Blockchain & Data Science",
-    readTime: "8 min read",
-    year: "2022",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    title: "ChatGPT, Random Numbers and the Lottery",
+    description: "An interesting exploration of how ChatGPT handles random number generation and what this reveals about AI systems when applied to lottery scenarios.",
+    category: "AI & Technology",
+    readTime: "7 min read",
+    link: "https://medium.com/geekculture/chatgpt-random-numbers-and-the-lottery-4285c7296098",
+    image: "/medium_images/m1.webp"
   },
   {
     id: "02",
-    title: "Knowledge Graph Embeddings Simplified",
-    description: "An in-depth exploration of knowledge graph embedding techniques, making complex theoretical concepts accessible through practical implementation.",
+    title: "How to Generate and Evaluate Knowledge Graph Embeddings",
+    description: "A comprehensive guide on generating and evaluating the performance of knowledge graph embeddings, covering practical implementation and evaluation metrics.",
     category: "Machine Learning",
     readTime: "12 min read",
-    year: "2022",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    link: "https://medium.com/data-science/how-to-generate-and-evaluate-the-performance-of-knowledge-graph-embeddings-95789abcb0c1",
+    image: "/medium_images/m2.webp"
   },
   {
     id: "03",
-    title: "Graph Neural Network Libraries: A Developer's Guide",
-    description: "An extensive comparison and tutorial covering the most popular GNN libraries for Python developers. A comprehensive guide for practitioners.",
-    category: "Tutorial",
-    readTime: "15 min read",
-    year: "2021",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    title: "What Does an Eerie Song on Global Warming Tell Us?",
+    description: "An intriguing analysis connecting music, data, and climate change messaging. Exploring how artistic expression can communicate environmental data and climate science.",
+    category: "Climate Science",
+    readTime: "8 min read",
+    link: "https://medium.com/@rohithtejam/what-does-an-eerie-song-on-global-warming-and-climate-change-tell-us-4e0b0f8a9eac",
+    image: "/medium_images/m3.webp"
   },
   {
     id: "04",
-    title: "Dynamic Graph Analysis in Bioinformatics",
-    description: "Pioneering research on dynamic graph structures applied to protein analysis. How temporal network changes reveal hidden biological patterns.",
-    category: "Research",
-    readTime: "10 min read",
-    year: "2021",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    title: "Let's Talk About Graph Neural Network Python Libraries",
+    description: "A comprehensive comparison and guide to the most popular Graph Neural Network libraries in Python, helping developers choose the right tools for their projects.",
+    category: "Tutorial",
+    readTime: "15 min read",
+    link: "https://medium.com/data-science/lets-talk-about-graph-neural-network-python-libraries-a0b23ec983b0",
+    image: "/medium_images/m4.webp"
   },
   {
     id: "05",
-    title: "AI Fairness & Bias Detection Framework",
-    description: "A comprehensive investigation into bias detection methodologies and fairness optimization techniques in machine learning models.",
-    category: "AI Ethics",
-    readTime: "14 min read",
-    year: "2021",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    title: "I Created Music from Data Using Python",
+    description: "A creative exploration of data sonification - transforming datasets into musical compositions using Python. Discover how data can become art through sound.",
+    category: "Data Visualization",
+    readTime: "10 min read",
+    link: "https://medium.com/data-science/i-created-music-from-data-using-python-adfc349f55f1",
+    image: "/medium_images/m5.webp"
   },
   {
     id: "06",
-    title: "Climate Data Processing with Python",
-    description: "Large-scale environmental data processing techniques and predictive modeling approaches for climate research applications.",
-    category: "Climate Science",
-    readTime: "11 min read",
-    year: "2023",
-    link: "https://medium.com/@rohithtejam",
-    image: "/api/placeholder/400/250"
+    title: "Graph Machine Learning in Biomedical Networks",
+    description: "An in-depth discussion on applying graph machine learning techniques to biomedical networks, exploring applications in drug discovery and biological analysis.",
+    category: "Bioinformatics",
+    readTime: "14 min read",
+    link: "https://medium.com/data-science/lets-talk-about-graph-machine-learning-in-biomedical-networks-8a84139e970b",
+    image: "/medium_images/m6.webp"
   }
 ]
 
@@ -110,8 +105,17 @@ export default function Articles() {
                 rel="noopener noreferrer"
                 className="block bg-gray-50 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
-                {/* Article Image Placeholder */}
+                {/* Article Image */}
                 <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 relative overflow-hidden">
+                  <Image 
+                    src={article.image} 
+                    alt={article.title}
+                    fill
+                    className="object-cover"
+                    quality={75}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    priority={index < 3} // Load first 3 images with priority
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                   <div className="absolute top-4 left-4">
                     <span className="inline-block px-3 py-1 bg-white/90 text-gray-800 text-sm rounded-full font-medium">
@@ -127,7 +131,6 @@ export default function Articles() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm text-gray-500">{article.readTime}</span>
-                    <span className="text-sm text-gray-500 font-mono">{article.year}</span>
                   </div>
                   
                   <h3 className="text-xl font-medium text-black mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
