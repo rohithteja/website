@@ -74,7 +74,7 @@ export default function Articles() {
         >
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
+              <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
                 i write
               </h1>
               <p className="text-4xl text-gray-600 max-w-2xl">

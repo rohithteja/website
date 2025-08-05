@@ -15,7 +15,7 @@ export default function About() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
+          <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
             je suis rohith
           </h1>
         </motion.div>

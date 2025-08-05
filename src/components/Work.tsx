@@ -95,7 +95,7 @@ export default function Work() {
         {/* Header */}
 
         <div className="mb-8">
-        <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
+        <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
           my work
           </h1>
           <h2 className="text-5xl font-light text-white mb-4">i estimate CO₂ emissions</h2>
