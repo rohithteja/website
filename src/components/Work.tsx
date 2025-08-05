@@ -93,7 +93,7 @@ export default function Work() {
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
           my work
           </h1>
-          <h2 className="text-5xl font-light text-white mb-4">i estimate CO2 emissions from city traffic</h2>
+          <h2 className="text-5xl font-light text-white mb-4">i estimate CO₂ emissions from city traffic</h2>
           <p className="text-gray-300 text-lg">study on Indian cities (display purposes only, values can be inaccurate)</p>
         </div>
 
@@ -104,12 +104,12 @@ export default function Work() {
             <p className="text-2xl font-bold text-white">{cityData.length}</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <h3 className="text-gray-400 text-sm font-medium">Total CO2 Emissions</h3>
-            <p className="text-2xl font-bold text-red-400">{formatNumber(totalCO2)} tons</p>
+            <h3 className="text-gray-400 text-sm font-medium">Total CO₂ Emissions</h3>
+            <p className="text-2xl font-bold text-red-400">{formatNumber(totalCO2)} tons/year</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-            <h3 className="text-gray-400 text-sm font-medium">Average CO2 per City</h3>
-            <p className="text-2xl font-bold text-orange-400">{formatNumber(avgCO2)} tons</p>
+            <h3 className="text-gray-400 text-sm font-medium">Average CO₂ per City</h3>
+            <p className="text-2xl font-bold text-orange-400">{formatNumber(avgCO2)} tons/year</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
             <h3 className="text-gray-400 text-sm font-medium">Total Population</h3>
@@ -125,7 +125,7 @@ export default function Work() {
               <div className="h-96 rounded-lg overflow-hidden">
                 <MapContainer 
                   center={[22.5, 78.9]} 
-                  zoom={5} 
+                  zoom={4} 
                   style={{ height: "100%", width: "100%" }}
                   className="rounded-lg"
                 >
@@ -147,16 +147,6 @@ export default function Work() {
                         mouseout: () => setSelectedCity(null),
                       }}
                     >
-                      <Popup>
-                        <div className="text-sm">
-                          <h4 className="font-bold text-lg">{city.city}</h4>
-                          <p><strong>State:</strong> {city.state}</p>
-                          <p><strong>Population:</strong> {formatNumber(city.population_2020)}</p>
-                          <p><strong>CO2 Emissions:</strong> {formatNumber(city.co2)} tons</p>
-                          <p><strong>GDP:</strong> ${city.gdp_2020.toFixed(1)}B USD</p>
-                          <p><strong>Urban Area:</strong> {city.urban_area_km2.toFixed(1)} km²</p>
-                        </div>
-                      </Popup>
                     </CircleMarker>
                   ))}
                 </MapContainer>
@@ -207,8 +197,8 @@ export default function Work() {
                     <span className="text-white">{formatNumber(selectedCity.population_2020)}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <span className="text-gray-400">CO2 Emissions:</span>
-                    <span className="text-red-400 font-medium">{formatNumber(selectedCity.co2)} tons</span>
+                    <span className="text-gray-400">CO₂ Emissions:</span>
+                    <span className="text-red-400 font-medium">{formatNumber(selectedCity.co2)} tons/year</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-gray-400">GDP (2020):</span>
