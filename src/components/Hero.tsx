@@ -355,14 +355,14 @@ export default function Hero() {
           className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
-          Articles
+          Blog
         </button>
         <button
           onClick={scrollToPublications}
           className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
-          Publications
+          Research
         </button>
         <button
           onClick={scrollToContact}

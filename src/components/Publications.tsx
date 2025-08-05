@@ -170,34 +170,6 @@ export default function Publications() {
             </motion.div>
           ))}
         </div>
-
-        {/* Footer CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="mt-12 text-center"
-        >
-          <div className="bg-black text-white rounded-xl p-6">
-            <h3 className="text-xl md:text-2xl font-light mb-4">
-              Interested in research collaboration?
-            </h3>
-            <p className="text-sm text-gray-300 mb-5 max-w-lg mx-auto">
-              Open to discussing new research opportunities and collaborative projects.
-            </p>
-            <a
-              href="#contact"
-              className="inline-flex items-center px-5 py-2 bg-white text-black text-sm font-medium rounded-full hover:bg-gray-100 transition-all duration-200"
-              onClick={(e) => {
-                e.preventDefault()
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-              }}
-            >
-              Let's talk
-            </a>
-          </div>
-        </motion.div>
       </div>
     </section>
   )

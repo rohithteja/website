@@ -7,7 +7,6 @@ import About from '@/components/About'
 import Work from '@/components/Work'
 import Articles from '@/components/Articles'
 import Publications from '@/components/Publications'
-import Skills from '@/components/Skills'
 import Contact from '@/components/Contact'
 import CustomCursor from '@/components/CustomCursor'
 
@@ -34,7 +33,6 @@ export default function Home() {
         <Work />
         <Articles />
         <Publications />
-        <Skills />
         <Contact />
       </motion.div>
     </main>

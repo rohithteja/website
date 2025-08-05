@@ -98,10 +98,10 @@ export default function Work() {
         <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-8">
           my work
           </h1>
-          <h2 className="text-5xl font-light text-white mb-4">i estimate CO₂ emissions</h2>
-          <h2 className="text-5xl font-light text-white mb-4">i build interpretable ML models</h2>
-          <h2 className="text-5xl font-light text-white mb-4">i craft interactive visualizations</h2>
-          <h2 className="text-5xl font-light text-white mb-4">simply put, i reshape complexity into clarity</h2>
+          <h2 className="text-4xl font-light text-white mb-4">i estimate CO₂ emissions</h2>
+          <h2 className="text-4xl font-light text-white mb-4">i build interpretable ML models</h2>
+          <h2 className="text-4xl font-light text-white mb-4">i craft interactive visualizations</h2>
+          <h2 className="text-4xl font-light text-white mb-4">simply put, i reshape complexity into clarity</h2>
             <div className="w-full h-px bg-gray-700 my-6" />
           <p className="text-5xl font-light text-white mb-4">check this dashboard i made:</p>
         </div>

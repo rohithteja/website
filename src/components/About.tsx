@@ -2,8 +2,26 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
+
+const greetings = [
+  "i am rohith",
+  "je suis rohith",
+  "ich bin rohith", 
+  "私は rohith です"
+]
 
 export default function About() {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % greetings.length)
+    }, 3000) // Change every 2.5 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <section id="about" className="py-24 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
@@ -16,7 +34,15 @@ export default function About() {
           className="mb-16"
         >
           <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
-            je suis rohith
+            <motion.span
+              key={currentIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              {greetings[currentIndex]}
+            </motion.span>
           </h1>
         </motion.div>
 
