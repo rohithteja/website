@@ -63,7 +63,7 @@ const articles = [
 export default function Articles() {
   return (
     <section id="articles" className="py-24 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -164,25 +164,24 @@ export default function Articles() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true }}
-          className="mt-20 text-center"
+          className="mt-16 text-center"
         >
-          <div className="bg-black text-white rounded-2xl p-12">
-            <h3 className="text-3xl md:text-4xl font-light mb-6">
+          <div className="bg-black text-white rounded-xl p-8">
+            <h3 className="text-2xl font-light mb-4">
               Want to read more?
             </h3>
-            <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
-              Check out my Medium blog for more in-depth articles on data science, 
-              machine learning, and the latest trends in AI technology.
+            <p className="text-base text-gray-300 mb-6 max-w-xl mx-auto">
+              Check out my Medium blog for more articles on data science and AI.
             </p>
             <a
               href="https://medium.com/@rohithtejam"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-3 bg-white text-black text-lg font-medium rounded-full hover:bg-gray-100 transition-all duration-200"
+              className="inline-flex items-center px-6 py-2 bg-white text-black text-base font-medium rounded-full hover:bg-gray-100 transition-all duration-200"
             >
               Visit My Medium Blog
               <svg 
-                className="w-5 h-5 ml-2" 
+                className="w-4 h-4 ml-2" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
