@@ -12,8 +12,8 @@ export default function Contact() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Built with curiosity.
+          <h2 className="text-xl md:text-xl font-bold mb-6">
+          Built with vibes, curiosity and 1729 cups of coffee.
           </h2>
           
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
