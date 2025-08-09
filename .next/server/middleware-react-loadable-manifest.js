@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"components/Work.tsx -> ./CO2Map\":{\"id\":\"components/Work.tsx -> ./CO2Map\",\"files\":[\"static/css/_app-pages-browser_src_components_CO2Map_tsx.css\",\"static/chunks/_app-pages-browser_src_components_CO2Map_tsx.js\"]}}"

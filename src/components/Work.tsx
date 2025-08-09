@@ -1,9 +1,18 @@
 'use client'
 
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { csvParse } from "d3-dsv";
-import "leaflet/dist/leaflet.css";
+import dynamic from 'next/dynamic';
+
+// Dynamically import the map component with SSR disabled
+const CO2Map = dynamic(() => import('./CO2Map'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-96 rounded-lg bg-gray-700 flex items-center justify-center">
+      <div className="text-white">Loading map...</div>
+    </div>
+  )
+});
 
 interface CityData {
   city: string;
@@ -49,27 +58,6 @@ export default function Work() {
         setLoading(false);
       });
   }, []);
-
-  const getCircleColor = (co2: number) => {
-    // Sort CO2 values to find percentiles
-    const sortedCO2 = cityData.map(city => city.co2).sort((a, b) => a - b);
-    
-    // Calculate 35th percentile (bottom 35% = low) and 70th percentile (top 30% = high)
-    const percentile35Index = Math.floor(sortedCO2.length * 0.35);
-    const percentile70Index = Math.floor(sortedCO2.length * 0.75);
-    
-    const lowThreshold = sortedCO2[percentile35Index];
-    const highThreshold = sortedCO2[percentile70Index];
-    
-    if (co2 > highThreshold) return '#dc2626'; // bright red - high (top 30%)
-    if (co2 > lowThreshold) return '#f59e0b'; // amber/yellow - medium (35th-70th percentile)
-    return '#10b981'; // green - low (bottom 35%)
-  };
-
-  const getCircleRadius = (population: number) => {
-    const maxPop = Math.max(...cityData.map(city => city.population_2020));
-    return Math.max(6, (population / maxPop) * 15);
-  };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -131,35 +119,10 @@ export default function Work() {
           <div className="lg:col-span-2">
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-white text-lg font-semibold mb-4">Interactive Map</h3>
-              <div className="h-96 rounded-lg overflow-hidden">
-                <MapContainer 
-                  center={[22.5, 78.9]} 
-                  zoom={4} 
-                  style={{ height: "100%", width: "100%" }}
-                  className="rounded-lg"
-                >
-                  <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                  />
-                  {cityData.map((city, index) => (
-                    <CircleMarker
-                      key={index}
-                      center={[city.lat, city.lon]}
-                      radius={getCircleRadius(city.population_2020)}
-                      color="#ffffff"
-                      weight={1}
-                      fillColor={getCircleColor(city.co2)}
-                      fillOpacity={0.8}
-                      eventHandlers={{
-                        mouseover: () => setSelectedCity(city),
-                        mouseout: () => setSelectedCity(null),
-                      }}
-                    >
-                    </CircleMarker>
-                  ))}
-                </MapContainer>
-              </div>
+              <CO2Map 
+                cityData={cityData}
+                onCityHover={setSelectedCity}
+              />
               
               {/* Legend */}
               <div className="mt-4 flex items-center justify-between text-sm text-gray-300">
