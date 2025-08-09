@@ -1,10 +1,11 @@
 'use client'
 
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export default function Hero() {
   const ref = useRef<HTMLElement>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -320,57 +321,137 @@ export default function Hero() {
       </div>
 
       {/* Logo and Copyright */}
-<div className="absolute top-6 left-6 flex items-center space-x-3 z-10">
-  <svg width="280" height="50" viewBox="0 0 280 100" xmlns="http://www.w3.org/2000/svg">
-    <style>
-       {`
-         .monogram { font-family: 'Arial', sans-serif; font-weight: bold; }
-         .insights { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 32px; fill: #555; }
-       `}
-    </style>
-    <text x="50" y="50" fontSize="60" fill="#000000" className="monogram">R</text>
-    <text x="77" y="50" fontSize="60" fill="#FFC107" className="monogram">T</text>
-    <text x="120" y="55" className="insights">©Insights by Rohith</text>
-  </svg>
-</div>
+      <div className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center space-x-3 z-10">
+        <svg 
+          className="w-32 h-6 md:w-56 lg:w-72" 
+          viewBox="0 0 280 100" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <style>
+             {`
+               .monogram { font-family: 'Arial', sans-serif; font-weight: bold; }
+               .insights { font-family: 'Arial', sans-serif; font-weight: bold; font-size: 32px; fill: #555; }
+               @media (max-width: 768px) {
+                 .insights { font-size: 20px; }
+               }
+             `}
+          </style>
+          <text x="50" y="50" fontSize="70" fill="#000000" className="monogram">R</text>
+          <text x="77" y="50" fontSize="70" fill="#FFC107" className="monogram">T</text>
+        </svg>
+      </div>
 
       {/* Navigation Menu */}
-      <div className="absolute top-6 right-6 flex items-center space-x-4">
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex absolute top-4 md:top-6 right-4 md:right-6 items-center space-x-2 lg:space-x-4">
         <button
           onClick={scrollToAbout}
-          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           About
         </button>
         <button
           onClick={scrollToWork}
-          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Work
         </button>
         <button
           onClick={scrollToArticles}
-          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Blog
         </button>
         <button
           onClick={scrollToPublications}
-          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Research
         </button>
         <button
           onClick={scrollToContact}
-          className="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Contact
         </button>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="md:hidden absolute top-4 right-4 z-20">
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 rounded-lg shadow-sm"
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {mobileMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-12 right-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[120px]"
+          >
+            <button
+              onClick={() => {
+                scrollToAbout()
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100 transition-colors"
+            >
+              About
+            </button>
+            <button
+              onClick={() => {
+                scrollToWork()
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100 transition-colors"
+            >
+              Work
+            </button>
+            <button
+              onClick={() => {
+                scrollToArticles()
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100 transition-colors"
+            >
+              Blog
+            </button>
+            <button
+              onClick={() => {
+                scrollToPublications()
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100 transition-colors"
+            >
+              Research
+            </button>
+            <button
+              onClick={() => {
+                scrollToContact()
+                setMobileMenuOpen(false)
+              }}
+              className="block w-full px-4 py-2 text-left text-black hover:bg-gray-100 transition-colors"
+            >
+              Contact
+            </button>
+          </motion.div>
+        )}
       </div>
 
       {/* Social Media Links */}
