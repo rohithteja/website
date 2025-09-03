@@ -9,6 +9,7 @@ import Articles from '@/components/Articles'
 import Publications from '@/components/Publications'
 import Contact from '@/components/Contact'
 import CustomCursor from '@/components/CustomCursor'
+import StickyNavigation from '@/components/StickyNavigation'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -22,6 +23,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
       <CustomCursor />
+      <StickyNavigation />
       
       <motion.div
         initial={{ opacity: 0 }}

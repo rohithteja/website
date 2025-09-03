@@ -343,38 +343,38 @@ export default function Hero() {
 
       {/* Navigation Menu */}
       {/* Desktop Navigation */}
-      <div className="hidden md:flex absolute top-4 md:top-6 right-4 md:right-6 items-center space-x-2 lg:space-x-4">
+      <div className="hidden md:flex absolute top-4 md:top-6 right-4 md:right-6 items-center space-x-4 lg:space-x-6">
         <button
           onClick={scrollToAbout}
-          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-3 py-2 text-gray-700 hover:text-black font-semibold transition-all duration-200 border-b-2 border-transparent hover:border-yellow-400"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           About
         </button>
         <button
           onClick={scrollToWork}
-          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-3 py-2 text-gray-700 hover:text-black font-semibold transition-all duration-200 border-b-2 border-transparent hover:border-yellow-400"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Work
         </button>
         <button
           onClick={scrollToArticles}
-          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-3 py-2 text-gray-700 hover:text-black font-semibold transition-all duration-200 border-b-2 border-transparent hover:border-yellow-400"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Blog
         </button>
         <button
           onClick={scrollToPublications}
-          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-3 py-2 text-gray-700 hover:text-black font-semibold transition-all duration-200 border-b-2 border-transparent hover:border-yellow-400"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Research
         </button>
         <button
           onClick={scrollToContact}
-          className="px-2 py-1 md:px-4 md:py-2 bg-yellow-400 hover:bg-yellow-500 transition-all duration-200 text-sm md:text-base font-bold text-black rounded-lg shadow-sm hover:shadow-md"
+          className="px-3 py-2 text-gray-700 hover:text-black font-semibold transition-all duration-200 border-b-2 border-transparent hover:border-yellow-400"
           style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
         >
           Contact
