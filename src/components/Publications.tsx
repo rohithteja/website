@@ -5,6 +5,17 @@ import { motion } from 'framer-motion'
 const featuredWork = [
   {
     id: "01",
+    title: "High-resolution gridded CO₂ and pollutant emission data from road traffic in Indian cities",
+    description: "We present a comprehensive 500-meter gridded dataset of city traffic emissions for 15 Indian cities, derived from street-level floating-car data (FCD) based on GPS positions and speeds of individual vehicles. Statistical and machine-learning techniques were applied to improve data quality and extrapolate data to cover all city traffic, rather than only vehicles equipped with GPS, using fuel consumption data.",
+    category: "Journal Article",
+    tech: ["Machine Learning", "Climate Science", "Emission dynamics", "Python"],
+    year: "2025",
+    link: "https://www.nature.com/articles/s41597-025-06287-9",
+    type: "publication",
+    venue: "Nature Scientific Data"
+  },
+  {
+    id: "02",
     title: "Drivers of natural gas use in U.S. residential buildings",
     description: "We analyze daily county-level gas consumption data across 1000 U.S. counties to assess spatial patterns and temperature sensitivities. Using interpretable machine learning models, we identify key predictors including income, employment, and building characteristics. The study estimates a potential 2.47 million MtCO₂ annual emission reduction through household insulation improvements and behavioral changes.",
     category: "Journal Article",
@@ -15,7 +26,7 @@ const featuredWork = [
     venue: "Science Advances"
   },
   {
-    id: "02",
+    id: "03",
     title: "Short-to-medium range forecast of natural gas use in the United States residential buildings",
     description: "A systematic framework for predicting short-to-medium-range natural gas consumption in U.S. homes using interpretable linear-plus-plateau models and seasonal temperature forecast ensembles. The model achieves 80% average accuracy with highest performance in Midwest and East Coast regions (up to 82% accuracy).",
     category: "Journal Article",
@@ -26,7 +37,7 @@ const featuredWork = [
     venue: "Journal of Cleaner Production"
   },
   {
-    id: "03",
+    id: "04",
     title: "A Study on Knowledge Graph Embeddings and Graph Neural Networks for Web Of Things",
     description: "Exploration of state-of-the-art knowledge graph embedding methods and Graph Neural Networks for the Web of Things platform. We evaluate both approaches on downstream tasks including link prediction, node classification, and triple classification, providing insights for implementation in WoT contexts.",
     category: "Preprint",
