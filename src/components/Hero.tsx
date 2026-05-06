@@ -469,7 +469,7 @@ export default function Hero() {
             </svg>
           </a>
           <a
-            href="https://linkedin.com/in/rohithtejam"
+            href="https://linkedin.com/in/rohithteja"
             target="_blank"
             rel="noopener noreferrer"
             className="text-black hover:text-gray-600 transition-colors p-2 bg-white/90 hover:bg-white rounded-full shadow-sm hover:shadow-md"
