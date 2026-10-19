@@ -1,7 +1,38 @@
 'use client'
 
-import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, CircleMarker, useMap } from "react-leaflet";
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
 import "leaflet/dist/leaflet.css";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+// OpenFreeMap: free, open-source vector tiles with no API key or registration.
+const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
+
+const BASEMAP_ATTRIBUTION =
+  '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> ' +
+  '<a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">&copy; OpenMapTiles</a> ' +
+  'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
+
+function OpenFreeMapBasemap() {
+  const map = useMap();
+
+  useEffect(() => {
+    const basemap = maplibreGL({
+      style: BASEMAP_STYLE,
+      attributionControl: false,
+    }).addTo(map);
+
+    map.attributionControl.addAttribution(BASEMAP_ATTRIBUTION);
+
+    return () => {
+      map.removeLayer(basemap);
+      map.attributionControl.removeAttribution(BASEMAP_ATTRIBUTION);
+    };
+  }, [map]);
+
+  return null;
+}
 
 interface CityData {
   city: string;
@@ -11,7 +42,6 @@ interface CityData {
   gdp_2020: number;
   urban_area_km2: number;
   road_length_km: number;
-  year: number;
   co2: number;
   lat: number;
   lon: number;
@@ -23,9 +53,6 @@ interface CO2MapProps {
 }
 
 export default function CO2Map({ cityData, onCityHover }: CO2MapProps) {
-  // Loaded from .env.local via NEXT_PUBLIC_CARTO_API_KEY (not committed to the repo)
-  const cartoApiKey = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
-
   const getCircleColor = (co2: number) => {
     // Sort CO2 values to find percentiles
     const sortedCO2 = cityData.map(city => city.co2).sort((a, b) => a - b);
@@ -55,10 +82,7 @@ export default function CO2Map({ cityData, onCityHover }: CO2MapProps) {
         style={{ height: "100%", width: "100%" }}
         className="relative z-0 rounded-lg"
       >
-        <TileLayer
-          url={`https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png?key=${cartoApiKey}`}
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        />
+        <OpenFreeMapBasemap />
         {cityData.map((city, index) => (
           <CircleMarker
             key={index}
@@ -72,8 +96,7 @@ export default function CO2Map({ cityData, onCityHover }: CO2MapProps) {
               mouseover: () => onCityHover(city),
               mouseout: () => onCityHover(null),
             }}
-          >
-          </CircleMarker>
+          />
         ))}
       </MapContainer>
     </div>

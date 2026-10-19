@@ -23,7 +23,6 @@ interface CityData {
   gdp_2020: number;
   urban_area_km2: number;
   road_length_km: number;
-  year: number;
   co2: number;
   lat: number;
   lon: number;
@@ -46,7 +45,6 @@ export default function Work() {
           gdp_2020: +d['GDP_2020(billion USD)'] || 0,
           urban_area_km2: +d.urban_area_km2 || 0,
           road_length_km: +d.road_length_km || 0,
-          year: +d.year || 0,
           co2: +d.co2 || 0,
           lat: +d.lat || 0,
           lon: +d.lon || 0,

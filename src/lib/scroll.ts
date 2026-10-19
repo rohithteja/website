@@ -10,10 +10,6 @@ export function setLenis(instance: Lenis | null) {
   lenis = instance
 }
 
-export function getLenis() {
-  return lenis
-}
-
 const NAV_DURATION = 1.1
 
 export function scrollToId(id: string) {

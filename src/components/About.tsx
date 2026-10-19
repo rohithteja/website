@@ -58,23 +58,6 @@ export default function About() {
               ))}
             </div>
 
-            {/* Highlights
-            <div className="mt-10 grid sm:grid-cols-2 gap-3">
-              {bio.highlights.map((highlight, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  viewport={{ once: true }}
-                  className="flex items-start gap-2 text-sm text-gray-700"
-                >
-                  <span className="mt-1 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0" />
-                  <span>{highlight}</span>
-                </motion.div>
-              ))}
-            </div> */}
-
             {/* Skills/Interests */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <div className="grid grid-cols-2 gap-8">

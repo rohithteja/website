@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import React, { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { keywords, profile, ui } from '@/data/content'
+import { keywords, ui } from '@/data/content'
 import { scrollToId } from '@/lib/scroll'
 import HeroLetters from './HeroLetters'
 import RiverCurve from './RiverCurve'

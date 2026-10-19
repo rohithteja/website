@@ -65,15 +65,6 @@ body {
   background: #FACC15;
 }
 
-/* Custom cursor */
-@media (hover: hover) and (pointer: fine) {
-  /* Keep default cursor on desktop */
-}
-
-@media (hover: none) and (pointer: coarse) {
-  /* Keep default cursor on mobile */
-}
-
 /* Scrolling keywords animation */
 @keyframes scroll {
   0% {

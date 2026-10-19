@@ -8,10 +8,8 @@
 
 export const profile = {
   name: 'Rohith Teja',
-  firstName: 'Rohith',
   role: 'Data Scientist',
   focus: 'Complex Systems & Energy Intelligence',
-  tagline: 'chaos to clarity',
   location: 'Paris, France',
   email: 'rohithtejam@gmail.com',
   website: 'https://rohithteja.is-a.dev/',
@@ -32,13 +30,6 @@ export const bio = {
     'I specialise in large-scale time-series forecasting, interpretable ML, and causal inference. My work spans natural gas demand forecasting across 1,000 U.S. counties to urban emissions modelling, using SHAP and causal ML to turn complex data into decisions people can trust.',
     'My research has been published in Science Advances and Nature Scientific Data, with collaborations across UC Irvine, Tsinghua University, and IIT Bombay.',
   ],
-  // highlights: [
-  //   'Technical lead, €1M street-scale emissions platform',
-  //   'Terabytes of floating car data · 100 Indian cities',
-  //   'India\'s 1st 500m-resolution daily CO₂ & pollutant maps',
-  //   '83% short-term gas forecast accuracy · 1,000 U.S. counties',
-  //   'Science Advances & Nature Scientific Data author',
-  // ],
   domains: ['Urban Mobility', 'Climate & Energy', 'Forecasting', 'Causal Inference', 'Knowledge Graphs', 'LLMs & RAG'],
   specialties: ['Forecasting & Time Series', 'Graph ML', 'Interpretable ML (SHAP)', 'Causal ML & DAGs', 'MLOps & Big Data', 'Interactive Data Viz'],
 }
@@ -108,37 +99,22 @@ export const experience = [
     ],
     tags: ['Deep Learning', 'Graph Embeddings', 'Bioinformatics'],
   },
-  // {
-  //   role: 'Data Analyst (Freelance)',
-  //   company: 'Independent',
-  //   location: 'Hyderabad, India',
-  //   period: '2014 — 2017',
-  //   type: 'Consulting',
-  //   summary: 'Built predictive models that shaped resource allocation for 10,000+ farm households.',
-  //   highlights: [
-  //     'Developed predictive models on demographic and agricultural data to drive resource allocation decisions across 10,000+ farm households in India.',
-  //   ],
-  //   tags: ['Predictive Modeling', 'Data Analysis'],
-  // },
 ]
 
 export const education = [
   {
     degree: 'PhD · Complex Systems & Machine Learning',
     school: 'Université Paris-Saclay, France',
-    // period: '2027',
     detail: 'Research on urban mobility, energy intelligence and causal ML.',
   },
   {
     degree: 'Master · Machine Learning & Data Mining',
     school: 'Université Jean Monnet, France',
-    // period: '2021', 
     detail: 'Specialised in graph neural networks and deep learning.',
   },
   {
     degree: 'Bachelor of Technology',
     school: 'NIT Raipur, India',
-    // period: '2014', 
     detail: 'Distributed computing and systems.',
   },
 ]
