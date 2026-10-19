@@ -50,7 +50,7 @@ export const experience = [
     role: 'Data Scientist',
     company: 'CEA Paris-Saclay',
     location: 'Paris, France',
-    period: '2024 - Present',
+    period: '2024 — Present',
     type: 'Fundamental research & applied data science',
     summary: 'Technical lead on building street-scale emission intelligence for India.',
     highlights: [
@@ -394,16 +394,16 @@ export const ui = {
     loadingDashboard: 'Loading dashboard...',
     heading: 'interact with my work',
     intro: 'try the dashboard from my Nature Scientific Data paper:',
-    subheading: '500m-resolution traffic CO₂ estimates · 100 Indian cities · hover a city to explore',
+    // subheading: '500m-resolution traffic CO₂ estimates · 100 Indian cities · hover a city to explore',
     cards: {
       totalCities: 'Total Cities',
       totalCo2: 'Total CO₂ Emissions',
       perCapitaCo2: 'Per Capita CO₂ Emissions',
       totalPopulation: 'Total Population',
     },
-    units: {
+    units: { 
       tonsPerYear: 'tons/year',
-      tonsPerPersonPerYear: 'tons/person/year',
+      tonsPerPersonPerYear: 'tons/person',
     },
     mapTitle: 'Interactive Map',
     legend: {
@@ -434,14 +434,25 @@ export const ui = {
   experience: {
     heading: 'experience',
     subheading: 'of turning data into decisions',
-    countSuffix: 'roles · click to expand',
+    countSuffix: 'roles',
     educationHeading: 'education',
+    regionLabel: 'Experience timeline',
+    prevLabel: 'Scroll timeline left',
+    nextLabel: 'Scroll timeline right',
+    contributionsLabel: 'key contributions',
+    expandFolderLabel: 'Expand key contributions',
+    collapseFolderLabel: 'Collapse key contributions',
+    closeFolderLabel: 'Close key contributions',
+    hint: 'drag or use arrow keys · open a folder for the full story',
   },
 
   articles: {
     heading: 'i write',
     subheading: 'on all things data science!',
+    regionLabel: 'Blog articles',
     readOnMedium: 'Read on Medium',
+    scrollPrev: 'Scroll articles left',
+    scrollNext: 'Scroll articles right',
     ctaHeading: 'Want to read more?',
     ctaBody: 'Check out my Medium blog for more articles on data science and AI.',
     ctaButton: 'Visit My Medium Blog',
@@ -453,7 +464,10 @@ export const ui = {
     subheading: 'published papers & contributions',
     countSuffix: 'papers',
     filters: ['All', 'Journal Article', 'Preprint', 'Working Paper'] as const,
+    regionLabel: 'Research publications',
     readPaper: 'Read Paper',
+    scrollPrev: 'Scroll publications left',
+    scrollNext: 'Scroll publications right',
   },
 
   contact: {

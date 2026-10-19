@@ -1,8 +1,9 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { publications, ui } from '@/data/content'
+import HorizontalScroller from './HorizontalScroller'
 
 const filters = ui.publications.filters
 
@@ -12,26 +13,28 @@ export default function Publications() {
     filter === 'All' ? publications : publications.filter((p) => p.type === filter)
 
   return (
-    <section id="publications" className="py-24 px-6 bg-white">
-      <div className="max-w-4xl mx-auto">
+    <section id="publications" className="overflow-hidden bg-white py-16">
+      <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mb-10"
+          className="mb-8 px-6 md:px-10 lg:px-14"
         >
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-6">
+              <h1 className="mb-6 text-5xl font-light leading-none text-black md:text-7xl lg:text-8xl">
                 {ui.publications.heading}
               </h1>
-              <p className="text-4xl text-gray-600 max-w-2xl">
+              <p className="max-w-2xl text-2xl text-gray-600 md:text-3xl">
                 {ui.publications.subheading}
               </p>
             </div>
-            <span className="text-sm text-gray-500 font-mono">({publications.length.toString().padStart(2, '0')} {ui.publications.countSuffix})</span>
+            <span className="font-mono text-sm text-gray-500">
+              ({publications.length.toString().padStart(2, '0')} {ui.publications.countSuffix})
+            </span>
           </div>
         </motion.div>
 
@@ -41,7 +44,7 @@ export default function Publications() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           viewport={{ once: true }}
-          className="flex flex-wrap gap-2 mb-10"
+          className="mb-8 flex flex-wrap gap-2 px-6 md:px-10 lg:px-14"
         >
           {filters.map((f) => {
             const isActive = filter === f
@@ -68,89 +71,71 @@ export default function Publications() {
           })}
         </motion.div>
 
-        {/* Work Grid */}
-        <motion.div layout className="space-y-6">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((work) => (
-              <motion.div
-                key={work.id}
-                layout
-                initial={{ opacity: 0, y: 50, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.4 }}
-                className="group"
-              >
-                <div className="bg-gray-50 rounded-2xl p-6 md:p-8 border border-gray-200 hover:border-yellow-400/60 transition-all duration-300 hover:shadow-md">
-                  <div className="grid lg:grid-cols-12 gap-6 items-start">
-                    {/* Left Column - Metadata */}
-                    <div className="lg:col-span-3">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl font-light text-gray-400 font-mono">{work.id}</span>
-                          <span className="text-sm text-gray-500 font-mono">{work.year}</span>
-                        </div>
-
-                        <div>
-                          <span className="inline-block px-2.5 py-1 bg-yellow-400/15 text-yellow-700 text-xs rounded-full font-semibold">
-                            {work.type}
-                          </span>
-                        </div>
-
-                        {work.venue && (
-                          <div>
-                            <span className="text-xs text-gray-600 font-medium">{work.venue}</span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-wrap gap-1">
-                          {work.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-xs text-gray-500 border border-gray-200 px-2 py-1 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column - Content */}
-                    <div className="lg:col-span-9">
-                      <div className="space-y-4">
-                        <h3 className="text-xl md:text-2xl font-light text-black mb-3 group-hover:text-gray-700 transition-colors">
-                          {work.title}
-                        </h3>
-                        <p className="text-base text-gray-600 leading-relaxed">{work.description}</p>
-
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                          <span className="text-sm font-medium text-gray-500">{work.venue}</span>
-                          <a
-                            href={work.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-sm text-black hover:text-gray-600 transition-colors group/link"
-                          >
-                            {ui.publications.readPaper}
-                            <svg
-                              className="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+        {/* Publications Rail */}
+        <HorizontalScroller
+          key={filter}
+          label={ui.publications.regionLabel}
+          prevLabel={ui.publications.scrollPrev}
+          nextLabel={ui.publications.scrollNext}
+          itemCount={filtered.length}
+        >
+          {filtered.map((work) => (
+            <article
+              key={work.id}
+              className="w-[82vw] max-w-[420px] shrink-0 snap-start sm:w-[52vw] lg:w-[400px]"
+            >
+              <div className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-gray-50 p-6 transition-all duration-300 hover:border-yellow-400/70 hover:bg-white hover:shadow-lg md:p-7">
+                {/* Metadata */}
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-2xl font-light text-gray-300">{work.id}</span>
+                  <span className="font-mono text-xs text-gray-500">{work.year}</span>
+                  <span className="ml-auto rounded-full bg-yellow-400/15 px-2.5 py-1 text-[11px] font-semibold text-yellow-700">
+                    {work.type}
+                  </span>
                 </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+
+                <h3 className="mt-4 line-clamp-3 text-lg font-medium leading-snug text-black transition-colors group-hover:text-gray-700">
+                  {work.title}
+                </h3>
+
+                <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-600">
+                  {work.description}
+                </p>
+
+                <div className="mb-6 mt-4 flex flex-wrap gap-1.5">
+                  {work.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-gray-200 px-2 py-1 text-[11px] text-gray-500"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-auto flex items-center justify-between border-t border-gray-200/70 pt-4">
+                  <span className="text-xs font-medium text-gray-500">{work.venue}</span>
+                  <a
+                    href={work.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group/link inline-flex items-center text-sm text-black transition-colors hover:text-gray-600"
+                  >
+                    {ui.publications.readPaper}
+                    <svg
+                      className="ml-2 h-4 w-4 transition-transform group-hover/link:translate-x-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </HorizontalScroller>
       </div>
     </section>
   )

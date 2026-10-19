@@ -86,7 +86,7 @@ export default function CO2Map({ cityData, onCityHover }: CO2MapProps) {
         {cityData.map((city, index) => (
           <CircleMarker
             key={index}
-            center={[city.lat, city.lon]}
+            center={[city.lat, city.lon]} 
             radius={getCircleRadius(city.population_2020)}
             color="#ffffff"
             weight={1}

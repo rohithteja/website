@@ -65,6 +65,17 @@ body {
   background: #FACC15;
 }
 
+/* Horizontal rails (blog / research) keep native scrolling but hide the
+   scrollbar, Apple-style — the progress line under the rail takes its place. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Scrolling keywords animation */
 @keyframes scroll {
   0% {
