@@ -130,6 +130,7 @@ export default function HeroLetters() {
       className="ml-8 scroll-smooth relative z-10 select-none pointer-events-none"
       role="img"
       aria-label={ui.hero.ariaLabel}
+      data-river-gap-left
     >
       <div className="relative -mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
         {/* Eyebrow — kept above the headline on small screens, where the ASCII
@@ -141,12 +142,11 @@ export default function HeroLetters() {
           </span>
         </div>
         <div className="flex flex-wrap p-0">
-          <div className="relative flex" data-river-anchor="chaos">
+          <div className="relative flex">
             <LetterDisplay prefix="r1a" word={ROW_1_A} cls={CLS_CHAOS} />
             {/* Vertical lead-in, centered over "chaos": turning → chaos to clarity. */}
             <div
               className="turning-rail absolute bottom-full left-1/2 mb-4 -translate-x-1/2 flex-col items-center"
-              data-river-anchor="turning"
               aria-hidden="true"
             >
               <span className="turning-beam absolute inset-y-0 left-1/2 -translate-x-1/2" />
@@ -161,15 +161,16 @@ export default function HeroLetters() {
           <LetterDisplay prefix="r1b" word={ROW_1_B} cls={CLS_TO} />
         </div>
         <div className="flex flex-wrap">
-          <div className="flex" data-river-anchor="clarity">
+          <div className="flex">
             <LetterDisplay prefix="r2" word={ROW_2_A} cls={CLS_CLARITY} />
           </div>
         </div>
 
         {/* ASCII portrait — floats in the clear space to the right of the headline,
             shares its scroll scatter (no backdrop so the glyphs sit on the hero).
-            The name/role caption sits beneath it on desktop. */}
-        <div className="hero-portrait absolute z-0">
+            The name/role caption sits beneath it on desktop. `data-river-gap`
+            tells the page river to thread the gap to its left, not the glyphs. */}
+        <div className="hero-portrait absolute z-0" data-river-gap>
           <AsciiPortrait />
           <div className="mx-auto mt-4 flex w-0 items-center justify-center gap-3 whitespace-nowrap">
             <span className="h-px w-10 bg-gradient-to-r from-yellow-400/80 to-transparent" />

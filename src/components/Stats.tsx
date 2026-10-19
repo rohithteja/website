@@ -37,7 +37,7 @@ function Counter({
 
 export default function Stats() {
   return (
-    <section className="bg-gray-950 py-20 px-6 relative overflow-hidden">
+    <section className="section-backdrop section-backdrop-950 py-20 px-6 overflow-hidden">
       {/* Subtle grid backdrop */}
       <div
         className="absolute inset-0 opacity-[0.06] pointer-events-none"
@@ -55,6 +55,7 @@ export default function Stats() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="text-center mb-14"
+          data-river-avoid
         >
           <h2 className="text-3xl md:text-5xl font-light text-white leading-tight">
             {ui.stats.heading} <span className="text-yellow-400">{ui.stats.headingAccent}</span>

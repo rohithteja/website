@@ -392,9 +392,8 @@ export const ui = {
   work: {
     loadingMap: 'Loading map...',
     loadingDashboard: 'Loading dashboard...',
-    heading: 'interact with my work',
+    heading: 'interact with my work', 
     intro: 'try the dashboard from my Nature Scientific Data paper:',
-    // subheading: '500m-resolution traffic CO₂ estimates · 100 Indian cities · hover a city to explore',
     cards: {
       totalCities: 'Total Cities',
       totalCo2: 'Total CO₂ Emissions',

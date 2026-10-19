@@ -5,7 +5,7 @@ import { profile, ui } from '@/data/content'
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-24 px-6 bg-gray-900 text-white relative overflow-hidden">
+    <section id="contact" className="section-backdrop section-backdrop-900 py-24 px-6 text-white overflow-hidden">
       {/* subtle grid */}
       <div
         className="absolute inset-0 opacity-[0.05] pointer-events-none"
@@ -16,7 +16,7 @@ export default function Contact() {
         }}
       />
 
-      <div className="max-w-4xl mx-auto text-center relative">
+      <div className="max-w-4xl mx-auto text-center relative" data-river-avoid>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}

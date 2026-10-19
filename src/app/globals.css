@@ -410,11 +410,38 @@ body {
   }
 }
 
-/* Hero river (src/components/RiverCurve.tsx): a bright segment travels the
-   meander from "turning", through "chaos" and "clarity", into the scroll cue.
-   Both beam layers use pathLength=1, so the dash offsets are normalized. */
+/* Section backdrops live on a negative-z pseudo-element, letting the page-wide
+   river thread (src/components/RiverCurve.tsx) pass above the background but
+   below every piece of content. */
+.section-backdrop {
+  position: relative;
+}
+.section-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -30;
+  pointer-events: none;
+  background: var(--section-backdrop);
+}
+.section-backdrop-white {
+  --section-backdrop: #ffffff;
+}
+.section-backdrop-900 {
+  --section-backdrop: #111827;
+}
+.section-backdrop-950 {
+  --section-backdrop: #030712;
+}
+.section-backdrop-hero {
+  --section-backdrop: #07070d;
+}
+
+/* Page river (src/components/RiverCurve.tsx): a soft pulse travels down each
+   strand of the helix. Both beam layers use pathLength=1, so the dash offsets
+   are normalized. */
 .river-beam {
-  animation: river-flow 7s linear infinite;
+  animation: river-flow 30s linear infinite;
 }
 @keyframes river-flow {
   from {
@@ -424,10 +451,18 @@ body {
     stroke-dashoffset: -1;
   }
 }
+/* A second pulse, half a cycle behind the first, so the next beam arrives
+   after ~15s rather than ~30s. */
+.river-beam--alt {
+  animation-delay: -15s;
+}
 @media (prefers-reduced-motion: reduce) {
   .river-beam {
     animation: none;
     stroke-dasharray: none;
     opacity: 0.4;
+  }
+  .river-beam--alt {
+    display: none;
   }
 }

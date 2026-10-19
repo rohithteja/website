@@ -70,23 +70,22 @@ export default function Work() {
 
   if (loading) {
     return (
-      <section id="work" className="bg-gray-900 w-full min-h-screen flex items-center justify-center">
+      <section id="work" className="section-backdrop section-backdrop-900 w-full min-h-screen flex items-center justify-center">
         <div className="text-white text-xl">{ui.work.loadingDashboard}</div>
       </section>
     );
   }
 
   return (
-    <section id="work" className="bg-gray-900 w-full min-h-screen p-6">
+    <section id="work" className="section-backdrop section-backdrop-900 w-full min-h-screen p-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
 
-        <div className="mb-8">
+        <div className="mb-8" data-river-avoid>
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-white leading-none mb-8">
           {ui.work.heading}
           </h1>
           <p className="text-2xl md:text-3xl font-light text-white mb-3">{ui.work.intro}</p>
-          <p className="text-lg text-gray-400 mb-8">{ui.work.subheading}</p>
         </div>
 
         {/* Stats Cards */}

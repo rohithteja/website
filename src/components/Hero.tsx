@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { keywords, ui } from '@/data/content'
 import { scrollToId } from '@/lib/scroll'
 import HeroLetters from './HeroLetters'
-import RiverCurve from './RiverCurve'
 
 // Deterministic pseudo-random in [0, 1) from an integer seed — no Math.random()
 // during render, so background particle positions are stable across SSR/client.
@@ -60,15 +59,17 @@ export default function Hero() {
   // Scroll cue retires early — it has done its job once the visitor moves.
   const cueOpacity = useTransform(scrollYProgress, [0, 0.12, 0.22], [1, 1, 0])
 
-  // The river fades as the headline starts to tear away, so it never floats
-  // over empty space once the letters have scattered.
-  const riverOpacity = useTransform(scrollYProgress, [0, 0.04, 0.13], [1, 1, 0])
-
   return (
     // `flow-root` establishes a block formatting context: without it the headline's
     // negative top margin collapses out of the hero and drags the whole page up by
     // 7rem, taking the social row and CTA off the top of the viewport with it.
-    <section ref={ref} className="relative min-h-screen flow-root overflow-clip bg-[#07070d]">
+    <section
+      ref={ref}
+      className="section-backdrop section-backdrop-hero relative min-h-screen flow-root overflow-clip"
+    >
+      {/* Hero atmosphere. Sits on its own negative layer so the page-wide river
+          thread can pass above it while every hero element stays above the thread. */}
+      <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
       {/* Dark background base + ambient glow (warm on the chaos side, cool on the clarity side).
           Stacked radials give the dark field depth: a muted red bloom on the chaos (left) side,
           a saturated amber bloom on the clarity (right) side, a low warm rim that lifts the
@@ -513,6 +514,7 @@ export default function Hero() {
           )
         })}
       </div>
+      </div>
 
       {/* Top scrim — a soft gradient behind the fixed nav so the links stay
           legible no matter which animated layer drifts under them. */}
@@ -803,7 +805,6 @@ export default function Hero() {
           Anchored to the first viewport, not the section: the hero runs ~1.7
           screens tall, so a `bottom-*` offset would push the cue out of sight. */}
       <motion.div
-        data-river-anchor="scroll"
         className="absolute left-1/2 z-10 hidden -translate-x-1/2 md:block"
         style={{ top: 'calc(100vh - 6rem)', opacity: cueOpacity }}
         aria-hidden="true"
@@ -820,16 +821,6 @@ export default function Hero() {
             />
           </span>
         </div>
-      </motion.div>
-
-      {/* River thread — a thin meander that starts at "turning", runs through
-          "chaos", crosses "clarity" and pours into the scroll cue. */}
-      <motion.div
-        className="pointer-events-none absolute inset-0 z-[5]"
-        style={{ opacity: riverOpacity }}
-        aria-hidden="true"
-      >
-        <RiverCurve />
       </motion.div>
 
       {/* Scrolling Keywords Banner — frosted strip whose ends fade out, so the

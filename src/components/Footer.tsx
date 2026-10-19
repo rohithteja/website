@@ -41,8 +41,8 @@ function SocialIcon({ name }: { name: SocialName }) {
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400 py-12 px-6">
-      <div className="max-w-6xl mx-auto">
+    <footer className="section-backdrop section-backdrop-950 text-gray-400 py-12 px-6">
+      <div className="max-w-6xl mx-auto" data-river-avoid>
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo + tagline */}
           <div className="text-center md:text-left">

@@ -13,7 +13,7 @@ export default function Publications() {
     filter === 'All' ? publications : publications.filter((p) => p.type === filter)
 
   return (
-    <section id="publications" className="overflow-hidden bg-white py-16">
+    <section id="publications" className="section-backdrop section-backdrop-white overflow-hidden py-16">
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <motion.div
@@ -22,6 +22,7 @@ export default function Publications() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="mb-8 px-6 md:px-10 lg:px-14"
+          data-river-avoid
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>

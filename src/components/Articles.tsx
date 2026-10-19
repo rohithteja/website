@@ -12,7 +12,7 @@ const slide =
 
 export default function Articles() {
   return (
-    <section id="articles" className="relative overflow-hidden bg-gray-900 py-16">
+    <section id="articles" className="section-backdrop section-backdrop-900 overflow-hidden py-16">
       {/* subtle grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -30,6 +30,7 @@ export default function Articles() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="mb-8 px-6 md:px-10 lg:px-14"
+          data-river-avoid
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>

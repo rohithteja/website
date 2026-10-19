@@ -12,6 +12,7 @@ import Publications from '@/components/Publications'
 import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import CustomCursor from '@/components/CustomCursor'
+import RiverCurve from '@/components/RiverCurve'
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
@@ -23,7 +24,7 @@ export default function Home() {
   if (!mounted) return null
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="relative isolate min-h-screen bg-gray-50">
       <CustomCursor />
 
       <motion.div
@@ -41,6 +42,8 @@ export default function Home() {
         <Contact />
         <Footer />
       </motion.div>
+
+      <RiverCurve />
     </main>
   )
 }
