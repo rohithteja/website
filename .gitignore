@@ -1,1 +1,14 @@
 node_modules
+
+# Next.js build output
+.next
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# environment variables (secrets)
+.env
+.env*.local
+.env*.development
+.env*.test

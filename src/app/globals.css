@@ -6,8 +6,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 4rem;
+  position: relative;
+}
+
+/* Bettina-style Lenis smooth scroll (see SmoothScroll.tsx) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch] {
+  overscroll-behavior: contain;
+}
+
+/* Offset anchored sections below the sticky nav */
+section[id] {
+  scroll-margin-top: 4.5rem;
 }
 
 body {
@@ -16,6 +34,35 @@ body {
   line-height: 1.6;
   color: #171717;
   background-color: #FAFAFA;
+  /* Entrance animations translate content horizontally; clip the resulting
+     overflow so it never creates a horizontal scrollbar on small screens. */
+  overflow-x: clip;
+}
+
+/* Selection */
+::selection {
+  background-color: #FACC15;
+  color: #171717;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 9999px;
+  border: 2px solid #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FACC15;
 }
 
 /* Custom cursor */
@@ -25,61 +72,6 @@ body {
 
 @media (hover: none) and (pointer: coarse) {
   /* Keep default cursor on mobile */
-}
-
-/* Hover effects */
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* Project card animations */
-.project-card {
-  transition: all 0.3s ease;
-  opacity: 1;
-}
-
-.project-card:hover {
-  transform: scale(1.02);
-}
-
-.project-card:hover .project-image {
-  transform: scale(1.05);
-}
-
-.project-image {
-  transition: transform 0.5s ease;
-}
-
-/* Smooth animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* Skills badges */
-.skill-badge {
-  transition: all 0.2s ease;
-}
-
-.skill-badge:hover {
-  background-color: #3B82F6;
-  color: white;
-  transform: translateY(-2px);
 }
 
 /* Scrolling keywords animation */
@@ -96,18 +88,344 @@ body {
   animation: scroll 30s linear infinite;
 }
 
-/* Sticky Navigation Styles */
-.sticky-nav-visible {
-  transform: translateY(0);
-  opacity: 1;
+/* Hero headline "turning / chaos to clarity" — exact port of portfolio-bettina's
+   LetterCollision (see src/components/HeroLetters.tsx). Letters carry the
+   Tailwind type classes; CSS here only adds colour for the dark hero and
+   will-change for the scroll transform. */
+.letter {
+  will-change: transform;
+}
+/* A wide, low-alpha bloom on the two anchor words — the letters read as lit
+   rather than merely tinted against the dark field. */
+.hero-letter--chaos {
+  color: #f87171;
+  text-shadow: 0 0 80px rgba(248, 113, 113, 0.20);
+}
+.hero-letter--to {
+  color: #9ca3af;
+}
+.hero-letter--clarity {
+  color: #facc15;
+  text-shadow: 0 0 90px rgba(250, 204, 21, 0.22);
+}
+.hero-letter--sub {
+  color: #a3a3a3;
 }
 
-.sticky-nav-hidden {
-  transform: translateY(-100%);
+/* Vertical "turning" lead-in above "chaos". Thin glyphs run down the left
+   margin; the hairline behind them reuses the scroll cue's travelling light
+   (see Hero.tsx), so the same beam motif bookends the hero top and bottom. */
+.turning-rail {
+  display: none;
+  font-size: 22px;
+  font-weight: 200;
+  line-height: 1;
+  color: #e4e4e7;
+  gap: 0.44em;
+  padding-block: 0.06em;
+}
+.turning-letter {
+  text-shadow: 0 0 18px rgba(228, 228, 231, 0.16), 0 0 26px rgba(250, 204, 21, 0.14);
+}
+.turning-beam {
+  width: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.24);
+  pointer-events: none;
+}
+.turning-beam::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: -24px;
+  height: 24px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    #fde047 30%,
+    #fefce8 50%,
+    #fde047 70%,
+    transparent
+  );
+  box-shadow: 0 0 9px rgba(253, 224, 71, 0.8);
+  animation: turning-beam 3.2s ease-in-out infinite;
+}
+@keyframes turning-beam {
+  0% {
+    top: -24px;
+    opacity: 0;
+  }
+  18%,
+  82% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .turning-beam::after {
+    animation: none;
+    opacity: 0.85;
+    top: 55%;
+  }
+}
+@media (min-width: 1024px) {
+  .turning-rail {
+    display: flex;
+  }
+}
+@media (min-width: 1280px) {
+  .turning-rail {
+    font-size: 26px;
+  }
+}
+@media (min-width: 1536px) {
+  .turning-rail {
+    font-size: 30px;
+  }
+}
+/* Tight desktop viewports: keep the lead-in, but compress it to fit above
+   "chaos" without running into the nav. */
+@media (min-width: 1024px) and (max-height: 760px) {
+  .turning-rail {
+    font-size: 13px;
+    gap: 0.28em;
+  }
+}
+@media (min-width: 1024px) and (max-height: 540px) {
+  .turning-rail {
+    display: none;
+  }
+}
+
+/* Portrait sizing/placement. It has to stay clear of the "to"/"clarity"
+   glyphs on narrower desktops, so it steps down in size there, and sits a
+   little closer to the headline on wide screens. */
+.hero-portrait {
+  display: none;
+  right: 1.5rem;
+  bottom: 0.5rem;
+  font-size: 10px;
+}
+@media (min-width: 1024px) {
+  .hero-portrait {
+    display: block;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1054px) {
+  .hero-portrait {
+    font-size: 9px;
+  }
+}
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .hero-portrait {
+    right: 2.5rem;
+    font-size: 9px;
+  }
+}
+@media (min-width: 1440px) {
+  .hero-portrait {
+    right: 2.5rem;
+    font-size: 13px;
+  }
+}
+@media (min-width: 1536px) {
+  .hero-portrait {
+    right: 6rem;
+    font-size: 14px;
+  }
+}
+
+/* Short desktop viewports: the portrait would otherwise rise into the
+   connect CTA above it, so drop it toward the fold instead of hiding it. */
+@media (max-height: 820px) {
+  .hero-portrait {
+    bottom: -5rem;
+  }
+}
+@media (max-height: 700px) {
+  .hero-portrait {
+    bottom: -6rem;
+  }
+}
+@media (min-width: 1024px) and (max-height: 620px) {
+  .hero-portrait {
+    font-size: 9px;
+  }
+}
+
+/* ASCII portrait (src/components/AsciiPortrait.tsx) — each glyph is one
+   monospace cell of the hero's letter-collision scatter. */
+.ascii-char {
+  width: 1ch;
+  flex: none;
+  white-space: pre;
+  will-change: transform;
+}
+
+/* Hero fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side.
+   Pure CSS — each particle gets its motion via CSS custom properties, so no JS ticker needed. */
+.firefly {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
   opacity: 0;
 }
 
-/* Ensure smooth scrolling accounts for sticky nav height */
-html {
-  scroll-padding-top: 4rem;
+.firefly::after {
+  content: '';
+  position: absolute;
+  inset: -220%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, currentColor 0%, transparent 60%);
+  filter: blur(1.5px);
+}
+
+/* Chaotic fireflies: erratic darting between random waypoints, flickering opacity.
+   Waypoint amplitudes scale with --chaos-amp (1 near "chaos" → 0 near "clarity"),
+   so they rage on the chaos side and settle still as the page resolves. */
+@keyframes firefly-chaos {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.1;
+  }
+  12% {
+    transform: translate3d(calc(var(--c1x, 12px) * var(--chaos-amp, 1)), calc(var(--c1y, -18px) * var(--chaos-amp, 1)), 0);
+    opacity: 0.95;
+  }
+  28% {
+    transform: translate3d(calc(var(--c2x, -30px) * var(--chaos-amp, 1)), calc(var(--c2y, 22px) * var(--chaos-amp, 1)), 0);
+    opacity: 0.25;
+  }
+  44% {
+    transform: translate3d(calc(var(--c3x, 42px) * var(--chaos-amp, 1)), calc(var(--c3y, -34px) * var(--chaos-amp, 1)), 0);
+    opacity: 1;
+  }
+  60% {
+    transform: translate3d(calc(var(--c4x, -26px) * var(--chaos-amp, 1)), calc(var(--c4y, -12px) * var(--chaos-amp, 1)), 0);
+    opacity: 0.4;
+  }
+  76% {
+    transform: translate3d(calc(var(--c5x, 18px) * var(--chaos-amp, 1)), calc(var(--c5y, 30px) * var(--chaos-amp, 1)), 0);
+    opacity: 0.9;
+  }
+  90% {
+    transform: translate3d(calc(var(--c6x, -38px) * var(--chaos-amp, 1)), calc(var(--c6y, 14px) * var(--chaos-amp, 1)), 0);
+    opacity: 0.15;
+  }
+}
+
+.firefly--chaos {
+  --chaos-amp: calc(1 - var(--hero-order, 0));
+  color: color-mix(
+    in srgb,
+    var(--ff-color, #f87171) calc((1 - var(--hero-order, 0)) * 100%),
+    #fde68a calc(var(--hero-order, 0) * 100%)
+  );
+  animation: firefly-chaos var(--dur, 7s) var(--delay, 0s) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Organized fireflies: smooth upward drift in even columns, steady glow, wave-staggered. */
+@keyframes firefly-clear {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--peak, 0.8);
+  }
+  50% {
+    transform: translate3d(var(--sway, 12px), calc(var(--rise, -150px) * 0.5), 0);
+    opacity: var(--peak, 0.8);
+  }
+  90% {
+    transform: translate3d(calc(var(--sway, 12px) * -1), var(--rise, -150px), 0);
+    opacity: var(--peak, 0.8);
+  }
+  100% {
+    transform: translate3d(0, var(--rise, -150px), 0);
+    opacity: 0;
+  }
+}
+
+.firefly--clear {
+  animation: firefly-clear var(--dur, 9s) var(--delay, 0s) linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Hero traffic dots: scattered + jittering near "chaos", snapping into a tidy
+   grid near "clarity". --hero-order (0→1) is set on the hero section by the
+   HeroLetters scroll timeline; scatter / jitter / color all scale off it. */
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.hero-dot {
+  position: absolute;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1;
+  color: color-mix(
+    in srgb,
+    #f87171 calc((1 - var(--hero-order, 0)) * 100%),
+    #facc15 calc(var(--hero-order, 0) * 100%)
+  );
+  left: calc(var(--gx) * 1% + var(--cx) * (1 - var(--hero-order, 0)));
+  top: calc(var(--gy) * 1% + var(--cy) * (1 - var(--hero-order, 0)));
+  opacity: 0.82;
+  text-shadow: 0 0 9px currentColor;
+  animation: hero-dot-jitter var(--dur, 3s) var(--delay, 0s) ease-in-out infinite;
+  will-change: transform, left, top;
+}
+
+@keyframes hero-dot-jitter {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translate3d(0, 0, 0);
+  }
+  22% {
+    transform: translate(-50%, -50%)
+      translate3d(calc(var(--jx) * (1 - var(--hero-order, 0))), calc(var(--jy) * (1 - var(--hero-order, 0))), 0);
+  }
+  46% {
+    transform: translate(-50%, -50%)
+      translate3d(calc(var(--jy) * -0.7 * (1 - var(--hero-order, 0))), calc(var(--jx) * 0.8 * (1 - var(--hero-order, 0))), 0);
+  }
+  68% {
+    transform: translate(-50%, -50%)
+      translate3d(calc(var(--jx) * -0.5 * (1 - var(--hero-order, 0))), calc(var(--jy) * -0.9 * (1 - var(--hero-order, 0))), 0);
+  }
+  86% {
+    transform: translate(-50%, -50%)
+      translate3d(calc(var(--jy) * 0.6 * (1 - var(--hero-order, 0))), calc(var(--jx) * -0.7 * (1 - var(--hero-order, 0))), 0);
+  }
+}
+
+/* Hero river (src/components/RiverCurve.tsx): a bright segment travels the
+   meander from "turning", through "chaos" and "clarity", into the scroll cue.
+   Both beam layers use pathLength=1, so the dash offsets are normalized. */
+.river-beam {
+  animation: river-flow 7s linear infinite;
+}
+@keyframes river-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .river-beam {
+    animation: none;
+    stroke-dasharray: none;
+    opacity: 0.4;
+  }
 }

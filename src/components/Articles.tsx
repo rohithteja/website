@@ -2,67 +2,11 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-
-const articles = [
-  {
-    id: "01",
-    title: "ChatGPT, Random Numbers and the Lottery",
-    description: "An interesting exploration of how ChatGPT handles random number generation and what this reveals about AI systems when applied to lottery scenarios.",
-    category: "AI & Technology",
-    readTime: "7 min read",
-    link: "https://medium.com/geekculture/chatgpt-random-numbers-and-the-lottery-4285c7296098",
-    image: "/medium_images/m1.webp"
-  },
-  {
-    id: "02",
-    title: "How to Generate and Evaluate Knowledge Graph Embeddings",
-    description: "A comprehensive guide on generating and evaluating the performance of knowledge graph embeddings, covering practical implementation and evaluation metrics.",
-    category: "Machine Learning",
-    readTime: "12 min read",
-    link: "https://medium.com/data-science/how-to-generate-and-evaluate-the-performance-of-knowledge-graph-embeddings-95789abcb0c1",
-    image: "/medium_images/m2.webp"
-  },
-  {
-    id: "03",
-    title: "What Does an Eerie Song on Global Warming Tell Us?",
-    description: "An intriguing analysis connecting music, data, and climate change messaging. Exploring how artistic expression can communicate environmental data and climate science.",
-    category: "Climate Science",
-    readTime: "8 min read",
-    link: "https://medium.com/@rohithtejam/what-does-an-eerie-song-on-global-warming-and-climate-change-tell-us-4e0b0f8a9eac",
-    image: "/medium_images/m3.webp"
-  },
-  {
-    id: "04",
-    title: "Let's Talk About Graph Neural Network Python Libraries",
-    description: "A comprehensive comparison and guide to the most popular Graph Neural Network libraries in Python, helping developers choose the right tools for their projects.",
-    category: "Tutorial",
-    readTime: "15 min read",
-    link: "https://medium.com/data-science/lets-talk-about-graph-neural-network-python-libraries-a0b23ec983b0",
-    image: "/medium_images/m4.webp"
-  },
-  {
-    id: "05",
-    title: "I Created Music from Data Using Python",
-    description: "A creative exploration of data sonification - transforming datasets into musical compositions using Python. Discover how data can become art through sound.",
-    category: "Data Visualization",
-    readTime: "10 min read",
-    link: "https://medium.com/data-science/i-created-music-from-data-using-python-adfc349f55f1",
-    image: "/medium_images/m5.webp"
-  },
-  {
-    id: "06",
-    title: "Graph Machine Learning in Biomedical Networks",
-    description: "An in-depth discussion on applying graph machine learning techniques to biomedical networks, exploring applications in drug discovery and biological analysis.",
-    category: "Bioinformatics",
-    readTime: "14 min read",
-    link: "https://medium.com/data-science/lets-talk-about-graph-machine-learning-in-biomedical-networks-8a84139e970b",
-    image: "/medium_images/m6.webp"
-  }
-]
+import { articles, ui } from '@/data/content'
 
 export default function Articles() {
   return (
-    <section id="articles" className="py-24 px-6 bg-white">
+    <section id="articles" className="py-24 px-6 bg-gray-50">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -75,10 +19,10 @@ export default function Articles() {
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div>
               <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
-                i write
+                {ui.articles.heading}
               </h1>
               <p className="text-4xl text-gray-600 max-w-2xl">
-                on all things data science!
+                {ui.articles.subheading}
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -142,7 +86,7 @@ export default function Articles() {
                   </p>
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                    <span className="text-sm text-gray-500">Read on Medium</span>
+                    <span className="text-sm text-gray-500">{ui.articles.readOnMedium}</span>
                     <svg 
                       className="w-4 h-4 text-gray-400 group-hover:text-black group-hover:translate-x-1 transition-all" 
                       fill="none" 
@@ -168,18 +112,18 @@ export default function Articles() {
         >
           <div className="bg-black text-white rounded-xl p-8">
             <h3 className="text-2xl font-light mb-4">
-              Want to read more?
+              {ui.articles.ctaHeading}
             </h3>
             <p className="text-base text-gray-300 mb-6 max-w-xl mx-auto">
-              Check out my Medium blog for more articles on data science and AI.
+              {ui.articles.ctaBody}
             </p>
             <a
-              href="https://medium.com/@rohithtejam"
+              href={ui.articles.ctaHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-6 py-2 bg-white text-black text-base font-medium rounded-full hover:bg-gray-100 transition-all duration-200"
             >
-              Visit My Medium Blog
+              {ui.articles.ctaButton}
               <svg 
                 className="w-4 h-4 ml-2" 
                 fill="none" 

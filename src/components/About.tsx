@@ -3,21 +3,15 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-
-const greetings = [
-  "i am rohith",
-  "je suis rohith",
-  "ich bin rohith", 
-  "私は rohith です"
-]
+import { profile, bio, ui } from '@/data/content'
 
 export default function About() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % greetings.length)
-    }, 3000) // Change every 2.5 seconds
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % ui.about.greetings.length)
+    }, 3000) // Change every 3 seconds
 
     return () => clearInterval(interval)
   }, [])
@@ -41,9 +35,10 @@ export default function About() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
             >
-              {greetings[currentIndex]}
+              {ui.about.greetings[currentIndex]}
             </motion.span>
           </h1>
+          <p className="text-xl text-gray-500 max-w-2xl">{profile.headline}</p>
         </motion.div>
 
         {/* Content Grid */}
@@ -56,74 +51,51 @@ export default function About() {
         >
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2">
-            <div className="prose prose-lg max-w-none">
-              <div className="text-lg text-gray-800 space-y-6 leading-relaxed">
-                <p>
-                  A data scientist and researcher with a passion for uncovering hidden patterns 
-                  in complex systems and translating data into actionable insights.
-                </p>
-                
-                <p>
-                  I have a strong track record of building and deploying successful machine learning 
-                  solutions across diverse domains.
-                </p>
-                
-                <p>
-                  Currently working in the <strong>Climate Change</strong> space, where I develop 
-                  predictive models and analytics platforms that help organizations understand 
-                  and mitigate environmental impact. I've built scalable data pipelines and 
-                  ML systems that process vast amounts of environmental data.
-                </p>
-                
-                <p>
-                  Before climate tech, I worked extensively in <strong>Bioinformatics</strong>, 
-                  where I developed algorithms for genomic data analysis and protein structure 
-                  prediction. I also spent time in <strong>Telecommunications</strong>, building 
-                  network optimization models and customer behavior analytics.
-                </p>
-                
-                <p>
-                  During my Master's in Machine Learning and Data Mining, I specialized in 
-                  <strong> Graph Neural Networks</strong>, exploring how complex relationships 
-                  in data can be modeled and understood through advanced deep learning techniques.
-                </p>
-                
-                <p>
-                  I work with all kinds of data structures - from text and images to graphs 
-                  and time series. Whether it's natural language processing, computer vision, 
-                  or network analysis, I love finding the right approach to make data shine.
-                </p>
-              </div>
+            <div className="text-lg text-gray-800 space-y-6 leading-relaxed">
+              <p className="text-2xl font-light text-black">{bio.intro}</p>
+              {bio.body.map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
             </div>
+
+            {/* Highlights
+            <div className="mt-10 grid sm:grid-cols-2 gap-3">
+              {bio.highlights.map((highlight, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  viewport={{ once: true }}
+                  className="flex items-start gap-2 text-sm text-gray-700"
+                >
+                  <span className="mt-1 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0" />
+                  <span>{highlight}</span>
+                </motion.div>
+              ))}
+            </div> */}
 
             {/* Skills/Interests */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-                    Domains
+                    {ui.about.labels.domains}
                   </h3>
                   <ul className="text-gray-800 space-y-2">
-                     <li>Urban Mobility</li>
-                    <li>Climate Science</li>
-                    <li>Bioinformatics</li>
-                    <li>Telecommunications</li>
-                    <li>Network Analysis</li>
-                     <li>Tbf any domain with data</li>
-
+                    {bio.domains.map((domain) => (
+                      <li key={domain}>{domain}</li>
+                    ))}
                   </ul>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
-                    Specialties
+                    {ui.about.labels.specialties}
                   </h3>
                   <ul className="text-gray-800 space-y-2">
-                    <li>Graph Neural Networks</li>
-                    <li>Deep Learning</li>
-                    <li>Data Mining</li>
-                    <li>Predictive Modeling</li>
-                     <li>Interactive Data Viz</li>
-
+                    {bio.specialties.map((specialty) => (
+                      <li key={specialty}>{specialty}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -141,8 +113,8 @@ export default function About() {
             >
               <div className="relative mb-8">
                 <Image
-                  src="https://rohithteja.github.io/images/pic2.jpeg"
-                  alt="Rohith Teja"
+                  src={profile.photo}
+                  alt={ui.about.photoAlt}
                   width={400}
                   height={500}
                   className="rounded-lg w-full object-cover"
@@ -153,28 +125,28 @@ export default function About() {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
-                    Currently
+                    {ui.about.labels.currently}
                   </h3>
                   <p className="text-gray-800">
-                    Data Scientist focused on Climate Change solutions
+                    {ui.about.currently}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
-                    Education
+                    {ui.about.labels.education}
                   </h3>
                   <p className="text-gray-800">
-                    Master's in Machine Learning & Data Mining
+                    {ui.about.education}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
-                    Location
+                    {ui.about.labels.location}
                   </h3>
                   <p className="text-gray-800">
-                    Paris, France
+                    {ui.about.location}
                   </p>
                 </div>
               </div>

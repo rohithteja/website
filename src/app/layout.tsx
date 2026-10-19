@@ -1,24 +1,33 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import SmoothScroll from '@/components/SmoothScroll'
+import { profile, ui } from '@/data/content'
 
 export const metadata: Metadata = {
-  title: 'Rohith Teja - Data Scientist',
-  description: 'Data Scientist with expertise in Machine Learning, Climate Change, and Complex Problem Solving',
-  keywords: ['data science', 'machine learning', 'climate change', 'graphs', 'AI'],
-  authors: [{ name: 'Rohith Teja' }],
+  title: ui.meta.title,
+  description: ui.meta.description,
+  keywords: ui.meta.keywords,
+  authors: [{ name: ui.meta.author }],
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/logo/1.png', sizes: '32x32', type: 'image/png' },
-      { url: '/logo/4.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-16.png', sizes: '16x16', type: 'image/png' },
     ],
-    apple: { url: '/logo/1.png', sizes: '180x180', type: 'image/png' },
+    apple: { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     shortcut: '/favicon.svg',
   },
   openGraph: {
-    title: 'Rohith Teja - Data Scientist',
-    description: 'Data Scientist with expertise in Machine Learning, Climate Change, and Complex Problem Solving',
+    title: ui.meta.openGraph.title,
+    description: ui.meta.openGraph.description,
     type: 'website',
+    url: profile.website,
+    siteName: ui.meta.openGraph.siteName,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: ui.meta.twitter.title,
+    description: ui.meta.twitter.description,
   },
 }
 
@@ -28,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <body className="antialiased">
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   )

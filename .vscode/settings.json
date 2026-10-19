@@ -1,0 +1,15 @@
+{
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/*.tsbuildinfo": true,
+    "**/.DS_Store": true
+  },
+  "files.watcherExclude": {
+    "**/.next/**": true,
+    "**/node_modules/**": true
+  },
+  "files.exclude": {
+    "**/.DS_Store": true
+  }
+}
