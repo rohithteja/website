@@ -70,7 +70,7 @@ export default function About() {
                     {bio.domains.map((domain) => (
                       <li key={domain}>{domain}</li>
                     ))}
-                  </ul>
+                  </ul> 
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
