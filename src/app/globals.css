@@ -177,12 +177,14 @@ body {
     transform: translateY(calc(55% - 12px));
   }
 }
-/* The marquee and the "turning" beam loop in CSS rather than through
-   framer-motion, so they are paused separately: Hero.tsx flips
-   data-hero-active from an IntersectionObserver once the hero leaves the
-   viewport. */
+/* Every hero loop is a CSS animation so it can be frozen in place: Hero.tsx
+   flips data-hero-active from an IntersectionObserver once the hero leaves the
+   viewport. Pausing keeps the atmosphere mounted, so scrolling back up resumes
+   each loop mid-cycle instead of rebuilding ~250 nodes and replaying them. */
 [data-hero-active='false'] .animate-scroll,
-[data-hero-active='false'] .turning-beam::after {
+[data-hero-active='false'] .turning-beam::after,
+[data-hero-active='false'] .hero-cue,
+[data-hero-active='false'] [data-hero-atmosphere] * {
   animation-play-state: paused;
 }
 @media (min-width: 1024px) {
@@ -365,6 +367,206 @@ body {
   will-change: transform, opacity;
 }
 
+/* Hero city grid: traffic, intersections, signs, warning glyphs. These were
+   framer-motion loops, which cannot be paused — the only way to stop them was to
+   unmount the layer, so the whole atmosphere was torn down and rebuilt on every
+   scroll past the hero. As CSS animations they freeze in place instead:
+   per-element duration/delay arrive as custom properties, and
+   `[data-hero-active='false']` pauses them all in one rule. */
+.hero-loop {
+  animation-duration: var(--dur, 8s);
+  animation-delay: var(--delay, 0s);
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+
+.hero-run-x {
+  animation-name: hero-run-x;
+  animation-timing-function: linear;
+}
+.hero-run-y {
+  animation-name: hero-run-y;
+  animation-timing-function: linear;
+}
+.hero-pulse {
+  animation-name: hero-pulse;
+  animation-timing-function: ease-in-out;
+}
+.hero-jam {
+  animation-name: hero-jam;
+  animation-timing-function: ease-in-out;
+}
+.hero-flicker {
+  animation-name: hero-flicker;
+  animation-timing-function: ease-in-out;
+}
+.hero-signal {
+  animation-name: hero-signal;
+  animation-timing-function: linear;
+}
+.hero-emergency {
+  animation-name: hero-emergency;
+  animation-timing-function: ease-in-out;
+}
+.hero-stripes {
+  animation-name: hero-stripes;
+  animation-timing-function: linear;
+}
+.hero-dart {
+  animation-name: hero-dart;
+  animation-timing-function: ease-in-out;
+}
+.hero-spin {
+  animation-name: hero-spin;
+  animation-timing-function: linear;
+}
+.hero-warn {
+  animation-name: hero-warn;
+  animation-timing-function: ease-in-out;
+}
+.hero-cue {
+  animation-name: hero-cue;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes hero-run-x {
+  from {
+    transform: translate3d(-20px, 0, 0);
+  }
+  to {
+    transform: translate3d(100vw, 0, 0);
+  }
+}
+@keyframes hero-run-y {
+  from {
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    transform: translate3d(0, 100vh, 0);
+  }
+}
+/* The centring offset lives inside the keyframe transform: an animated
+   transform replaces the inline one, so it has to be repeated here. */
+@keyframes hero-pulse {
+  0%,
+  100% {
+    transform: translate3d(-50%, -50%, 0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0) scale(1.5);
+    opacity: 0.8;
+  }
+}
+@keyframes hero-jam {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.8);
+    opacity: 1;
+  }
+}
+@keyframes hero-flicker {
+  0%,
+  100% {
+    opacity: var(--o-min, 0.4);
+  }
+  50% {
+    opacity: var(--o-max, 0.7);
+  }
+}
+@keyframes hero-signal {
+  0% {
+    color: #ef4444;
+  }
+  25% {
+    color: #eab308;
+  }
+  50%,
+  75% {
+    color: #22c55e;
+  }
+  100% {
+    color: #eab308;
+  }
+}
+@keyframes hero-emergency {
+  0% {
+    transform: translate3d(-50px, 0, 0);
+    opacity: 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(100vw, 0, 0);
+    opacity: 0;
+  }
+}
+@keyframes hero-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 40px;
+  }
+}
+@keyframes hero-dart {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  35% {
+    transform: translate3d(var(--x1, 0), var(--y1, 0), 0) rotate(var(--r1, 0deg));
+    opacity: 1;
+  }
+  70% {
+    transform: translate3d(var(--x2, 0), var(--y2, 0), 0) rotate(0deg);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+}
+@keyframes hero-spin {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(180deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0.3;
+  }
+}
+@keyframes hero-warn {
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+@keyframes hero-cue {
+  from {
+    transform: translate3d(0, -24px, 0);
+  }
+  to {
+    transform: translate3d(0, 48px, 0);
+  }
+}
+
 /* Hero traffic dots: scattered + jittering near "chaos", snapping into a tidy
    grid near "clarity". --hero-order (0→1) is set on the hero section by the
    HeroLetters scroll timeline; scatter / jitter / color all scale off it. */
@@ -445,19 +647,16 @@ body {
 
 /* Page river (src/components/RiverCurve.tsx): a soft pulse travels down each
    strand of the helix. Both beam layers use pathLength=1, so the dash offsets
-   are normalized. The pulses — and the blurred glow behind them — only run
-   while the page is scrolling (`river-active`); at rest they freeze and the
-   glow falls back to its bare low-opacity stroke, which reads the same without
-   the cost of rasterizing a full-page filter. */
+   are normalized. The pulses only run while the page is scrolling
+   (`river-active`); at rest they freeze. The beam glow is built from wide,
+   low-opacity strokes instead of an SVG blur filter, so nothing has to be
+   re-rasterized per frame. */
 .river-beam {
   animation: river-flow 30s linear infinite;
   animation-play-state: paused;
 }
 .river-active .river-beam {
   animation-play-state: running;
-}
-.river-active .river-beam--glow {
-  filter: url(#river-glow);
 }
 @keyframes river-flow {
   from {
@@ -481,7 +680,12 @@ body {
   .river-beam--alt {
     display: none;
   }
+  /* Without dasharray the whole path paints, so keep the layered glow dim
+     enough that the frozen beam still reads as a soft thread. */
+  .river-beam--halo {
+    opacity: 0.05;
+  }
   .river-beam--glow {
-    filter: url(#river-glow);
+    opacity: 0.12;
   }
 }

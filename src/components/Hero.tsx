@@ -87,11 +87,16 @@ export default function Hero() {
     >
       {/* Hero atmosphere. Sits on its own negative layer so the page-wide river
           thread can pass above it while every hero element stays above the thread.
-          Every layer here loops forever, so the whole block is unmounted while the
-          hero is off-screen (see the IntersectionObserver above) — that is what
-          stops the framer-motion animations instead of letting them run unseen. */}
-      {heroActive && (
-        <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
+          Every loop in here is a CSS animation, so `data-hero-active` (see the
+          IntersectionObserver above) freezes them with `animation-play-state`
+          instead of unmounting the layer. The whole atmosphere keeps its nodes:
+          tearing ~250 of them down and rebuilding them on scroll-back restarted
+          every loop from zero and caused a visible hitch. */}
+      <div
+        data-hero-atmosphere
+        className="pointer-events-none absolute inset-0 -z-20"
+        aria-hidden="true"
+      >
         {/* Dark background base + ambient glow (warm on the chaos side, cool on the clarity side).
             Stacked radials give the dark field depth: a muted red bloom on the chaos (left) side,
             a saturated amber bloom on the clarity (right) side, a low warm rim that lifts the
@@ -154,24 +159,19 @@ export default function Hero() {
             >
               {/* Traffic on horizontal roads */}
               {Array.from({ length: 6 }, (_, carIndex) => (
-                <motion.div
+                <div
                   key={`h-car-${roadIndex}-${carIndex}`}
-                  className="absolute text-xs font-mono text-yellow-300"
-                  style={{
-                    top: '-6px',
-                  }}
-                  animate={{
-                    x: ['-20px', '100vw'],
-                  }}
-                  transition={{
-                    duration: 8 + seeded(roadIndex * 100 + carIndex) * 6,
-                    repeat: Infinity,
-                    delay: carIndex * (2 + seeded(roadIndex * 100 + carIndex + 1) * 3),
-                    ease: "linear",
-                  }}
+                  className="hero-loop hero-run-x absolute text-xs font-mono text-yellow-300"
+                  style={
+                    {
+                      top: '-6px',
+                      '--dur': `${8 + seeded(roadIndex * 100 + carIndex) * 6}s`,
+                      '--delay': `${carIndex * (2 + seeded(roadIndex * 100 + carIndex + 1) * 3)}s`,
+                    } as CSSProperties
+                  }
                 >
                   {['→', '▶', '►', '⟶'][carIndex % 4]}
-                </motion.div>
+                </div>
               ))}
             </div>
           ))}
@@ -187,24 +187,19 @@ export default function Hero() {
             >
               {/* Traffic on vertical roads */}
               {Array.from({ length: 4 }, (_, carIndex) => (
-                <motion.div
+                <div
                   key={`v-car-${roadIndex}-${carIndex}`}
-                  className="absolute text-xs font-mono text-amber-300"
-                  style={{
-                    left: '-6px',
-                  }}
-                  animate={{
-                    y: ['-20px', '100vh'],
-                  }}
-                  transition={{
-                    duration: 10 + seeded(roadIndex * 100 + carIndex + 2) * 8,
-                    repeat: Infinity,
-                    delay: carIndex * (3 + seeded(roadIndex * 100 + carIndex + 3) * 4),
-                    ease: "linear",
-                  }}
+                  className="hero-loop hero-run-y absolute text-xs font-mono text-amber-300"
+                  style={
+                    {
+                      left: '-6px',
+                      '--dur': `${10 + seeded(roadIndex * 100 + carIndex + 2) * 8}s`,
+                      '--delay': `${carIndex * (3 + seeded(roadIndex * 100 + carIndex + 3) * 4)}s`,
+                    } as CSSProperties
+                  }
                 >
                   {['↓', '▼', '⇓', '⟱'][carIndex % 4]}
-                </motion.div>
+                </div>
               ))}
             </div>
           ))}
@@ -212,47 +207,37 @@ export default function Hero() {
           {/* Intersections */}
           {Array.from({ length: 8 }, (_, hIndex) =>
             Array.from({ length: 10 }, (_, vIndex) => (
-              <motion.div
+              <div
                 key={`intersection-${hIndex}-${vIndex}`}
-                className="absolute w-2 h-2 bg-white/20 rounded-full"
-                style={{
-                  left: `${10 + vIndex * 9}%`,
-                  top: `${15 + hIndex * 12}%`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.3, 0.8, 0.3],
-                }}
-                transition={{
-                  duration: 4 + seeded(hIndex * 10 + vIndex) * 4,
-                  repeat: Infinity,
-                  delay: (hIndex + vIndex) * 0.5,
-                }}
+                className="hero-loop hero-pulse absolute w-2 h-2 bg-white/20 rounded-full"
+                style={
+                  {
+                    left: `${10 + vIndex * 9}%`,
+                    top: `${15 + hIndex * 12}%`,
+                    '--dur': `${4 + seeded(hIndex * 10 + vIndex) * 4}s`,
+                    '--delay': `${(hIndex + vIndex) * 0.5}s`,
+                  } as CSSProperties
+                }
               />
             ))
           )}
 
           {/* Traffic Lights */}
           {Array.from({ length: 12 }, (_, i) => (
-            <motion.div
+            <div
               key={`traffic-light-${i}`}
-              className="absolute text-sm font-mono"
-              style={{
-                left: `${15 + (i * 8)}%`,
-                top: `${20 + (i % 4) * 20}%`,
-              }}
-              animate={{
-                color: ['#ef4444', '#eab308', '#22c55e', '#22c55e', '#eab308'],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                delay: i * 1.5,
-              }}
+              className="hero-loop hero-signal absolute text-sm font-mono"
+              style={
+                {
+                  left: `${15 + (i * 8)}%`,
+                  top: `${20 + (i % 4) * 20}%`,
+                  '--dur': '8s',
+                  '--delay': `${i * 1.5}s`,
+                } as CSSProperties
+              }
             >
               ●
-            </motion.div>
+            </div>
           ))}
 
           {/* Buildings (ASCII) */}
@@ -266,92 +251,80 @@ export default function Hero() {
                 width: '20px',
               }}
             >
-              <motion.div
-                animate={{
-                  opacity: [0.4, 0.7, 0.4],
-                }}
-                transition={{
-                  duration: 6 + seeded(i * 5 + 1) * 4,
-                  repeat: Infinity,
-                  delay: seeded(i * 5 + 2) * 3,
-                }}
+              <div
+                className="hero-loop hero-flicker"
+                style={
+                  {
+                    '--o-min': 0.4,
+                    '--o-max': 0.7,
+                    '--dur': `${6 + seeded(i * 5 + 1) * 4}s`,
+                    '--delay': `${seeded(i * 5 + 2) * 3}s`,
+                  } as CSSProperties
+                }
               >
                 <div>┌─┐</div>
                 <div>│ │</div>
                 <div>│ │</div>
                 <div>└─┘</div>
-              </motion.div>
+              </div>
             </div>
           ))}
 
           {/* Highway Signs */}
           {Array.from({ length: 6 }, (_, i) => (
-            <motion.div
+            <div
               key={`sign-${i}`}
-              className="absolute text-xs font-mono text-slate-300"
-              style={{
-                left: `${20 + i * 15}%`,
-                top: `${8 + (i % 2) * 35}%`,
-              }}
-              animate={{
-                opacity: [0.5, 1, 0.5],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                delay: i * 2,
-              }}
+              className="hero-loop hero-flicker absolute text-xs font-mono text-slate-300"
+              style={
+                {
+                  left: `${20 + i * 15}%`,
+                  top: `${8 + (i % 2) * 35}%`,
+                  '--o-min': 0.5,
+                  '--o-max': 1,
+                  '--dur': '5s',
+                  '--delay': `${i * 2}s`,
+                } as CSSProperties
+              }
             >
                 <div className="bg-yellow-400/15 px-1 py-0.5 rounded text-[10px]">
                 {['DATA ST', 'ML AVE', 'AI BLVD', 'TECH HWY', 'CODE ST', 'ALGO RD'][i]}
               </div>
-            </motion.div>
+            </div>
           ))}
 
           {/* Emergency Vehicles */}
           {Array.from({ length: 3 }, (_, i) => (
-            <motion.div
+            <div
               key={`emergency-${i}`}
-              className="absolute text-sm font-mono text-red-500"
-              style={{
-                top: `${25 + i * 25}%`,
-              }}
-              animate={{
-                x: ['-50px', '100vw'],
-                opacity: [0, 1, 1, 1, 0],
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                delay: i * 8 + seeded(i * 7 + 1) * 10,
-                ease: "easeInOut",
-              }}
+              className="hero-loop hero-emergency absolute text-sm font-mono text-red-500"
+              style={
+                {
+                  top: `${25 + i * 25}%`,
+                  '--dur': '6s',
+                  '--delay': `${i * 8 + seeded(i * 7 + 1) * 10}s`,
+                } as CSSProperties
+              }
             >
               🚑
-            </motion.div>
+            </div>
           ))}
 
           {/* Data Flow Streams (representing network traffic) — warm accent yellow
               on the clarity side, matching CLARITY + the Let's Connect CTA. */}
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              background: `repeating-linear-gradient(
+          <div
+            className="hero-loop hero-stripes absolute inset-0"
+            style={
+              {
+                background: `repeating-linear-gradient(
                 45deg,
                 transparent,
                 transparent 10px,
                 rgba(250, 204, 21, 0.04) 10px,
                 rgba(250, 204, 21, 0.04) 20px
               )`,
-            }}
-            animate={{
-              backgroundPosition: ['0px 0px', '40px 40px'],
-            }}
-            transition={{
-              duration: 34,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+                '--dur': '34s',
+              } as CSSProperties
+            }
           />
         </div>
 
@@ -381,72 +354,84 @@ export default function Hero() {
 
           {/* Erratic traffic: little cars darting in every direction */}
           {Array.from({ length: 16 }, (_, i) => (
-            <motion.span
+            <span
               key={`erratic-${i}`}
-              className="absolute text-xs font-mono"
-              style={{ left: `${(i * 7) % 52}%`, top: `${(i * 13) % 94}%` }}
-              animate={{
-                x: [0, (seeded(i * 31 + 1) - 0.5) * 160, (seeded(i * 31 + 2) - 0.5) * 160],
-                y: [0, (seeded(i * 31 + 3) - 0.5) * 160, (seeded(i * 31 + 4) - 0.5) * 160],
-                opacity: [0, 1, 0.2, 0],
-                rotate: [0, (seeded(i * 31 + 5) - 0.5) * 260, 0],
-              }}
-              transition={{
-                duration: 1.2 + seeded(i * 31 + 6) * 2,
-                repeat: Infinity,
-                delay: seeded(i * 31 + 7) * 2.5,
-                ease: 'easeInOut',
-              }}
+              className="hero-loop hero-dart absolute text-xs font-mono"
+              style={
+                {
+                  left: `${(i * 7) % 52}%`,
+                  top: `${(i * 13) % 94}%`,
+                  '--x1': `${Math.round((seeded(i * 31 + 1) - 0.5) * 160)}px`,
+                  '--y1': `${Math.round((seeded(i * 31 + 3) - 0.5) * 160)}px`,
+                  '--x2': `${Math.round((seeded(i * 31 + 2) - 0.5) * 160)}px`,
+                  '--y2': `${Math.round((seeded(i * 31 + 4) - 0.5) * 160)}px`,
+                  '--r1': `${Math.round((seeded(i * 31 + 5) - 0.5) * 260)}deg`,
+                  '--dur': `${1.2 + seeded(i * 31 + 6) * 2}s`,
+                  '--delay': `${seeded(i * 31 + 7) * 2.5}s`,
+                } as CSSProperties
+              }
             >
               <span
                 className={['text-red-400', 'text-red-500', 'text-slate-400', 'text-slate-500'][i % 4]}
               >
                 {['→', '←', '↑', '↓', '↗', '↘', '↖', '↙', '⇄', '⟲'][i % 10]}
               </span>
-            </motion.span>
+            </span>
           ))}
 
           {/* Congestion hotspots: pulsing jam clusters */}
           {Array.from({ length: 5 }, (_, c) =>
             Array.from({ length: 5 }, (_, d) => (
-              <motion.span
+              <span
                 key={`jam-${c}-${d}`}
-                className="absolute w-1.5 h-1.5 rounded-full"
-                style={{
-                  left: `${6 + c * 9 + (d % 2) * 2}%`,
-                  top: `${12 + c * 14 + ((d * 3) % 8)}%`,
-                  backgroundColor: d % 3 === 0 ? '#f87171' : d % 3 === 1 ? '#dc2626' : '#94a3b8',
-                }}
-                animate={{ scale: [1, 1.8, 1], opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 1.4 + (c + d) * 0.2, repeat: Infinity, delay: (c + d) * 0.3 }}
+                className="hero-loop hero-jam absolute w-1.5 h-1.5 rounded-full"
+                style={
+                  {
+                    left: `${6 + c * 9 + (d % 2) * 2}%`,
+                    top: `${12 + c * 14 + ((d * 3) % 8)}%`,
+                    backgroundColor: d % 3 === 0 ? '#f87171' : d % 3 === 1 ? '#dc2626' : '#94a3b8',
+                    '--dur': `${1.4 + (c + d) * 0.2}s`,
+                    '--delay': `${(c + d) * 0.3}s`,
+                  } as CSSProperties
+                }
               />
             ))
           )}
 
           {/* Spinning glyphs (traffic / math noise) */}
           {Array.from({ length: 6 }, (_, i) => (
-            <motion.span
+            <span
               key={`spin-${i}`}
-              className="absolute text-sm font-mono text-slate-400/70"
-              style={{ left: `${5 + ((i * 7) % 50)}%`, top: `${8 + ((i * 23) % 84)}%` }}
-              animate={{ rotate: [0, 360], opacity: [0.3, 0.9, 0.3] }}
-              transition={{ duration: 5 + (i % 4) * 3, repeat: Infinity, ease: 'linear', delay: i * 0.4 }}
+              className="hero-loop hero-spin absolute text-sm font-mono text-slate-400/70"
+              style={
+                {
+                  left: `${5 + ((i * 7) % 50)}%`,
+                  top: `${8 + ((i * 23) % 84)}%`,
+                  '--dur': `${5 + (i % 4) * 3}s`,
+                  '--delay': `${i * 0.4}s`,
+                } as CSSProperties
+              }
             >
               {['⟳', '⇄', '∿', '≈', '×', '◉', '⌁', '⚡'][i]}
-            </motion.span>
+            </span>
           ))}
 
           {/* Collision / warning flashes */}
           {Array.from({ length: 3 }, (_, i) => (
-            <motion.span
+            <span
               key={`warn-${i}`}
-              className="absolute text-xs font-mono"
-              style={{ left: `${6 + i * 12}%`, top: `${20 + (i % 2) * 55}%` }}
-              animate={{ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }}
-              transition={{ duration: 2 + i * 0.4, repeat: Infinity, delay: i * 0.8 }}
+              className="hero-loop hero-warn absolute text-xs font-mono"
+              style={
+                {
+                  left: `${6 + i * 12}%`,
+                  top: `${20 + (i % 2) * 55}%`,
+                  '--dur': `${2 + i * 0.4}s`,
+                  '--delay': `${i * 0.8}s`,
+                } as CSSProperties
+              }
             >
               <span className="text-red-400">⚠</span>
-            </motion.span>
+            </span>
           ))}
         </div>
 
@@ -536,8 +521,7 @@ export default function Hero() {
             )
           })}
         </div>
-        </div>
-      )}
+      </div>
 
       {/* Top scrim — a soft gradient behind the fixed nav so the links stay
           legible no matter which animated layer drifts under them. */}
@@ -837,13 +821,10 @@ export default function Hero() {
             {ui.nav.scrollCue}
           </span>
           <span className="relative h-12 w-px overflow-hidden bg-white/25">
-            {heroActive && (
-              <motion.span
-                className="absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-transparent via-yellow-200 to-transparent"
-                animate={{ y: [-24, 48] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
+            <span
+              className="hero-loop hero-cue absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-transparent via-yellow-200 to-transparent"
+              style={{ '--dur': '2.4s' } as CSSProperties}
+            />
           </span>
         </div>
       </motion.div>

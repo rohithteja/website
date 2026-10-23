@@ -428,10 +428,10 @@ export default function RiverCurve() {
       spinFrame = window.requestAnimationFrame(spin)
     }
 
-    // The travelling beams (and their blurred glow) only animate while the page
-    // is actually moving. `river-active` drives that from globals.css; it is
-    // dropped shortly after scroll events stop so an idle page rasterizes no
-    // filters and runs no animations.
+    // The travelling beams only animate while the page is actually moving.
+    // `river-active` drives that from globals.css; it is dropped shortly after
+    // scroll events stop so an idle page runs no animations. Nothing here is
+    // filter-based, so toggling it never re-rasterizes the river.
     let idleTimer = 0
     const markScrolling = () => {
       window.clearTimeout(idleTimer)
@@ -528,13 +528,6 @@ export default function RiverCurve() {
             <stop offset="70%" stopColor="#ff6b5e" />
             <stop offset="100%" stopColor="#ff4d4d" />
           </linearGradient>
-          <filter id="river-glow" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="3.2" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
           {/* Reading copy gets a soft clearing so the thread never crosses text
               it would sit behind; cards and other boxes are left untouched. */}
           <filter id="river-avoid-soft" x="-10%" y="-10%" width="120%" height="120%">
@@ -601,22 +594,37 @@ export default function RiverCurve() {
 
                 {/* Travelling light: two beams per strand, half a cycle apart,
                     so a pulse passes the viewport about every 15s instead of
-                    every 30s. Each beam is a soft glow under a bright core. */}
+                    every 30s. Each beam is a soft glow under a bright core.
+                    The glow is layered strokes rather than a Gaussian blur:
+                    a filter on the full-page path has to be re-rasterized
+                    every frame while the beam animates, which is exactly the
+                    scroll lag we were trying to avoid. */}
                 {[0, 1].map((beamIndex) => {
                   const beamClass = `river-beam${beamIndex === 1 ? ' river-beam--alt' : ''}`
 
                   return (
                     <g key={`beam-${tone}-${beamIndex}`}>
                       <path
+                        className={`${beamClass} river-beam--halo`}
+                        d={path}
+                        pathLength={1}
+                        fill="none"
+                        stroke={`url(#river-beam-${tone})`}
+                        strokeWidth={20}
+                        strokeLinecap="round"
+                        strokeDasharray="0.01 0.99"
+                        opacity={0.05}
+                      />
+                      <path
                         className={`${beamClass} river-beam--glow`}
                         d={path}
                         pathLength={1}
                         fill="none"
                         stroke={`url(#river-beam-${tone})`}
-                        strokeWidth={9}
+                        strokeWidth={10}
                         strokeLinecap="round"
                         strokeDasharray="0.01 0.99"
-                        opacity={0.24}
+                        opacity={0.12}
                       />
                       <path
                         className={`${beamClass} river-beam--core`}
