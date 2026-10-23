@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { csvParse } from "d3-dsv";
 import dynamic from 'next/dynamic';
 import { ui } from '@/data/content';
@@ -32,6 +32,8 @@ export default function Work() {
   const [cityData, setCityData] = useState<CityData[]>([]);
   const [selectedCity, setSelectedCity] = useState<CityData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapInView, setMapInView] = useState(false);
+  const mapSlotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/data.csv")
@@ -57,6 +59,32 @@ export default function Work() {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    // The map slot only exists once the dashboard has finished loading.
+    if (loading) return;
+
+    const slot = mapSlotRef.current;
+    if (!slot || mapInView) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      setMapInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setMapInView(true);
+        observer.disconnect();
+      },
+      // Start fetching the map chunk shortly before it scrolls into view.
+      { rootMargin: "300px 0px" }
+    );
+
+    observer.observe(slot);
+    return () => observer.disconnect();
+  }, [loading, mapInView]);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -113,10 +141,18 @@ export default function Work() {
           <div className="lg:col-span-2">
             <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
               <h3 className="text-white text-lg font-semibold mb-4">{ui.work.mapTitle}</h3>
-              <CO2Map 
-                cityData={cityData}
-                onCityHover={setSelectedCity}
-              />
+              <div ref={mapSlotRef}>
+                {mapInView ? (
+                  <CO2Map
+                    cityData={cityData}
+                    onCityHover={setSelectedCity}
+                  />
+                ) : (
+                  <div className="h-96 rounded-lg bg-gray-700 flex items-center justify-center">
+                    <div className="text-white">{ui.work.loadingMap}</div>
+                  </div>
+                )}
+              </div>
               
               {/* Legend */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm text-gray-300">

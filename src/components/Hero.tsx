@@ -10,7 +10,9 @@ import HeroLetters from './HeroLetters'
 // during render, so background particle positions are stable across SSR/client.
 function seeded(seed: number): number {
   const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453
-  return x - Math.floor(x)
+  // Round off the low bits: server and browser `Math.sin` implementations can
+  // differ by a few ulps, which would otherwise render as a hydration mismatch.
+  return Math.round((x - Math.floor(x)) * 1e4) / 1e4
 }
 
 // Fractal-noise tile used as a faint film-grain overlay (see the hero background
@@ -25,6 +27,7 @@ export default function Hero() {
   const ref = useRef<HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [heroActive, setHeroActive] = useState(true)
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -52,6 +55,20 @@ export default function Hero() {
     }
   }, [])
 
+  // The hero's decorative layers loop forever (framer-motion and CSS alike), so
+  // they are only kept alive while the section is near the viewport. The margin
+  // re-arms them just before the hero scrolls back in, so nothing pops on screen.
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroActive(entry.isIntersecting),
+      { rootMargin: '260px 0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   // Button animation
   const buttonY = useTransform(scrollYProgress, [0, 1], [0, -60])
   const buttonOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
@@ -65,456 +82,462 @@ export default function Hero() {
     // 7rem, taking the social row and CTA off the top of the viewport with it.
     <section
       ref={ref}
+      data-hero-active={heroActive}
       className="section-backdrop section-backdrop-hero relative min-h-screen flow-root overflow-clip"
     >
       {/* Hero atmosphere. Sits on its own negative layer so the page-wide river
-          thread can pass above it while every hero element stays above the thread. */}
-      <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
-      {/* Dark background base + ambient glow (warm on the chaos side, cool on the clarity side).
-          Stacked radials give the dark field depth: a muted red bloom on the chaos (left) side,
-          a saturated amber bloom on the clarity (right) side, a low warm rim that lifts the
-          headline, and a cool wash spilling in from the top edge. */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background: [
-            'radial-gradient(1200px 780px at 8% 10%, rgba(248,113,113,0.13), transparent 62%)',
-            'radial-gradient(1100px 820px at 92% 74%, rgba(250,204,21,0.16), transparent 62%)',
-            'radial-gradient(820px 560px at 64% 98%, rgba(250,204,21,0.07), transparent 68%)',
-            'radial-gradient(1500px 900px at 50% -12%, rgba(148,163,184,0.07), transparent 70%)',
-            'linear-gradient(180deg, #0b0b14 0%, #08080f 52%, #050508 100%)',
-          ].join(','),
-        }}
-      />
-      {/* Vignette — sinks the corners so the headline and CTA hold the frame. */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(120% 120% at 50% 42%, transparent 40%, rgba(3,3,6,0.55) 100%)',
-        }}
-      />
-      {/* Film grain — a trace of texture so the large dark fields read as photographic
-          rather than flat. Soft-light keeps the glows underneath intact. */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-soft-light"
-        aria-hidden="true"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
-      {/* Warm key light pooled behind the headline, so the letter scatter sits in light
-          instead of floating flat on the grid. */}
-      <div
-        className="pointer-events-none absolute bottom-0 left-0 hidden h-[64%] w-[72%] md:block"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(closest-side at 30% 82%, rgba(250,204,21,0.10), rgba(248,113,113,0.05) 48%, transparent 80%)',
-        }}
-      />
-      {/* City Road Network with Traffic Flow — clean, orderly side (right) */}
-      <div
-        className="absolute inset-0 opacity-30 pointer-events-none overflow-hidden"
-        style={{
-          WebkitMaskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 62%)',
-          maskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 62%)',
-        }}
-      >
-        {/* Horizontal Roads */}
-        {Array.from({ length: 8 }, (_, roadIndex) => (
-          <div
-            key={`h-road-${roadIndex}`}
-            className="absolute w-full h-0.5 bg-white/10"
-            style={{
-              top: `${15 + roadIndex * 12}%`,
-            }}
-          >
-            {/* Traffic on horizontal roads */}
-            {Array.from({ length: 6 }, (_, carIndex) => (
-              <motion.div
-                key={`h-car-${roadIndex}-${carIndex}`}
-                className="absolute text-xs font-mono text-yellow-300"
-                style={{
-                  top: '-6px',
-                }}
-                animate={{
-                  x: ['-20px', '100vw'],
-                }}
-                transition={{
-                  duration: 8 + seeded(roadIndex * 100 + carIndex) * 6,
-                  repeat: Infinity,
-                  delay: carIndex * (2 + seeded(roadIndex * 100 + carIndex + 1) * 3),
-                  ease: "linear",
-                }}
-              >
-                {['→', '▶', '►', '⟶'][carIndex % 4]}
-              </motion.div>
-            ))}
-          </div>
-        ))}
-
-        {/* Vertical Roads */}
-        {Array.from({ length: 10 }, (_, roadIndex) => (
-          <div
-            key={`v-road-${roadIndex}`}
-            className="absolute h-full w-0.5 bg-white/10"
-            style={{
-              left: `${10 + roadIndex * 9}%`,
-            }}
-          >
-            {/* Traffic on vertical roads */}
-            {Array.from({ length: 4 }, (_, carIndex) => (
-              <motion.div
-                key={`v-car-${roadIndex}-${carIndex}`}
-                className="absolute text-xs font-mono text-amber-300"
-                style={{
-                  left: '-6px',
-                }}
-                animate={{
-                  y: ['-20px', '100vh'],
-                }}
-                transition={{
-                  duration: 10 + seeded(roadIndex * 100 + carIndex + 2) * 8,
-                  repeat: Infinity,
-                  delay: carIndex * (3 + seeded(roadIndex * 100 + carIndex + 3) * 4),
-                  ease: "linear",
-                }}
-              >
-                {['↓', '▼', '⇓', '⟱'][carIndex % 4]}
-              </motion.div>
-            ))}
-          </div>
-        ))}
-
-        {/* Intersections */}
-        {Array.from({ length: 8 }, (_, hIndex) =>
-          Array.from({ length: 10 }, (_, vIndex) => (
-            <motion.div
-              key={`intersection-${hIndex}-${vIndex}`}
-              className="absolute w-2 h-2 bg-white/20 rounded-full"
-              style={{
-                left: `${10 + vIndex * 9}%`,
-                top: `${15 + hIndex * 12}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.3, 0.8, 0.3],
-              }}
-              transition={{
-                duration: 4 + seeded(hIndex * 10 + vIndex) * 4,
-                repeat: Infinity,
-                delay: (hIndex + vIndex) * 0.5,
-              }}
-            />
-          ))
-        )}
-
-        {/* Traffic Lights */}
-        {Array.from({ length: 12 }, (_, i) => (
-          <motion.div
-            key={`traffic-light-${i}`}
-            className="absolute text-sm font-mono"
-            style={{
-              left: `${15 + (i * 8)}%`,
-              top: `${20 + (i % 4) * 20}%`,
-            }}
-            animate={{
-              color: ['#ef4444', '#eab308', '#22c55e', '#22c55e', '#eab308'],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              delay: i * 1.5,
-            }}
-          >
-            ●
-          </motion.div>
-        ))}
-
-        {/* Buildings (ASCII) */}
-        {Array.from({ length: 20 }, (_, i) => (
-          <div
-            key={`building-${i}`}
-            className="absolute text-xs font-mono text-slate-400/50 leading-tight"
-            style={{
-              left: `${5 + (i * 4.5)}%`,
-              top: `${10 + (i % 3) * 30}%`,
-              width: '20px',
-            }}
-          >
-            <motion.div
-              animate={{
-                opacity: [0.4, 0.7, 0.4],
-              }}
-              transition={{
-                duration: 6 + seeded(i * 5 + 1) * 4,
-                repeat: Infinity,
-                delay: seeded(i * 5 + 2) * 3,
-              }}
-            >
-              <div>┌─┐</div>
-              <div>│ │</div>
-              <div>│ │</div>
-              <div>└─┘</div>
-            </motion.div>
-          </div>
-        ))}
-
-        {/* Highway Signs */}
-        {Array.from({ length: 6 }, (_, i) => (
-          <motion.div
-            key={`sign-${i}`}
-            className="absolute text-xs font-mono text-slate-300"
-            style={{
-              left: `${20 + i * 15}%`,
-              top: `${8 + (i % 2) * 35}%`,
-            }}
-            animate={{
-              opacity: [0.5, 1, 0.5],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              delay: i * 2,
-            }}
-          >
-              <div className="bg-yellow-400/15 px-1 py-0.5 rounded text-[10px]">
-              {['DATA ST', 'ML AVE', 'AI BLVD', 'TECH HWY', 'CODE ST', 'ALGO RD'][i]}
-            </div>
-          </motion.div>
-        ))}
-
-        {/* Emergency Vehicles */}
-        {Array.from({ length: 3 }, (_, i) => (
-          <motion.div
-            key={`emergency-${i}`}
-            className="absolute text-sm font-mono text-red-500"
-            style={{
-              top: `${25 + i * 25}%`,
-            }}
-            animate={{
-              x: ['-50px', '100vw'],
-              opacity: [0, 1, 1, 1, 0],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              delay: i * 8 + seeded(i * 7 + 1) * 10,
-              ease: "easeInOut",
-            }}
-          >
-            🚑
-          </motion.div>
-        ))}
-
-        {/* Data Flow Streams (representing network traffic) — warm accent yellow
-            on the clarity side, matching CLARITY + the Let's Connect CTA. */}
-        <motion.div
-          className="absolute inset-0"
+          thread can pass above it while every hero element stays above the thread.
+          Every layer here loops forever, so the whole block is unmounted while the
+          hero is off-screen (see the IntersectionObserver above) — that is what
+          stops the framer-motion animations instead of letting them run unseen. */}
+      {heroActive && (
+        <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
+        {/* Dark background base + ambient glow (warm on the chaos side, cool on the clarity side).
+            Stacked radials give the dark field depth: a muted red bloom on the chaos (left) side,
+            a saturated amber bloom on the clarity (right) side, a low warm rim that lifts the
+            headline, and a cool wash spilling in from the top edge. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden="true"
           style={{
-            background: `repeating-linear-gradient(
-              45deg,
-              transparent,
-              transparent 10px,
-              rgba(250, 204, 21, 0.04) 10px,
-              rgba(250, 204, 21, 0.04) 20px
-            )`,
-          }}
-          animate={{
-            backgroundPosition: ['0px 0px', '40px 40px'],
-          }}
-          transition={{
-            duration: 34,
-            repeat: Infinity,
-            ease: "linear",
+            background: [
+              'radial-gradient(1200px 780px at 8% 10%, rgba(248,113,113,0.13), transparent 62%)',
+              'radial-gradient(1100px 820px at 92% 74%, rgba(250,204,21,0.16), transparent 62%)',
+              'radial-gradient(820px 560px at 64% 98%, rgba(250,204,21,0.07), transparent 68%)',
+              'radial-gradient(1500px 900px at 50% -12%, rgba(148,163,184,0.07), transparent 70%)',
+              'linear-gradient(180deg, #0b0b14 0%, #08080f 52%, #050508 100%)',
+            ].join(','),
           }}
         />
-      </div>
+        {/* Vignette — sinks the corners so the headline and CTA hold the frame. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background:
+              'radial-gradient(120% 120% at 50% 42%, transparent 40%, rgba(3,3,6,0.55) 100%)',
+          }}
+        />
+        {/* Film grain — a trace of texture so the large dark fields read as photographic
+            rather than flat. Soft-light keeps the glows underneath intact. */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-soft-light"
+          aria-hidden="true"
+          style={{ backgroundImage: GRAIN_URL }}
+        />
+        {/* Warm key light pooled behind the headline, so the letter scatter sits in light
+            instead of floating flat on the grid. */}
+        <div
+          className="pointer-events-none absolute bottom-0 left-0 hidden h-[64%] w-[72%] md:block"
+          aria-hidden="true"
+          style={{
+            background:
+              'radial-gradient(closest-side at 30% 82%, rgba(250,204,21,0.10), rgba(248,113,113,0.05) 48%, transparent 80%)',
+          }}
+        />
+        {/* City Road Network with Traffic Flow — clean, orderly side (right) */}
+        <div
+          className="absolute inset-0 opacity-30 pointer-events-none overflow-hidden"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 62%)',
+            maskImage: 'linear-gradient(to left, black 0%, black 40%, transparent 62%)',
+          }}
+        >
+          {/* Horizontal Roads */}
+          {Array.from({ length: 8 }, (_, roadIndex) => (
+            <div
+              key={`h-road-${roadIndex}`}
+              className="absolute w-full h-0.5 bg-white/10"
+              style={{
+                top: `${15 + roadIndex * 12}%`,
+              }}
+            >
+              {/* Traffic on horizontal roads */}
+              {Array.from({ length: 6 }, (_, carIndex) => (
+                <motion.div
+                  key={`h-car-${roadIndex}-${carIndex}`}
+                  className="absolute text-xs font-mono text-yellow-300"
+                  style={{
+                    top: '-6px',
+                  }}
+                  animate={{
+                    x: ['-20px', '100vw'],
+                  }}
+                  transition={{
+                    duration: 8 + seeded(roadIndex * 100 + carIndex) * 6,
+                    repeat: Infinity,
+                    delay: carIndex * (2 + seeded(roadIndex * 100 + carIndex + 1) * 3),
+                    ease: "linear",
+                  }}
+                >
+                  {['→', '▶', '►', '⟶'][carIndex % 4]}
+                </motion.div>
+              ))}
+            </div>
+          ))}
 
-      {/* CHAOS layer (left): tangled roads, erratic traffic, congestion & spinning glyphs */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        style={{
-          WebkitMaskImage: 'linear-gradient(to right, black 0%, black 48%, transparent 66%)',
-          maskImage: 'linear-gradient(to right, black 0%, black 48%, transparent 66%)',
-        }}
-      >
-        {/* Tangled, diagonal roads */}
-        {Array.from({ length: 9 }, (_, i) => (
-          <div
-            key={`tangle-${i}`}
-            className="absolute bg-white/10"
+          {/* Vertical Roads */}
+          {Array.from({ length: 10 }, (_, roadIndex) => (
+            <div
+              key={`v-road-${roadIndex}`}
+              className="absolute h-full w-0.5 bg-white/10"
+              style={{
+                left: `${10 + roadIndex * 9}%`,
+              }}
+            >
+              {/* Traffic on vertical roads */}
+              {Array.from({ length: 4 }, (_, carIndex) => (
+                <motion.div
+                  key={`v-car-${roadIndex}-${carIndex}`}
+                  className="absolute text-xs font-mono text-amber-300"
+                  style={{
+                    left: '-6px',
+                  }}
+                  animate={{
+                    y: ['-20px', '100vh'],
+                  }}
+                  transition={{
+                    duration: 10 + seeded(roadIndex * 100 + carIndex + 2) * 8,
+                    repeat: Infinity,
+                    delay: carIndex * (3 + seeded(roadIndex * 100 + carIndex + 3) * 4),
+                    ease: "linear",
+                  }}
+                >
+                  {['↓', '▼', '⇓', '⟱'][carIndex % 4]}
+                </motion.div>
+              ))}
+            </div>
+          ))}
+
+          {/* Intersections */}
+          {Array.from({ length: 8 }, (_, hIndex) =>
+            Array.from({ length: 10 }, (_, vIndex) => (
+              <motion.div
+                key={`intersection-${hIndex}-${vIndex}`}
+                className="absolute w-2 h-2 bg-white/20 rounded-full"
+                style={{
+                  left: `${10 + vIndex * 9}%`,
+                  top: `${15 + hIndex * 12}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.3, 0.8, 0.3],
+                }}
+                transition={{
+                  duration: 4 + seeded(hIndex * 10 + vIndex) * 4,
+                  repeat: Infinity,
+                  delay: (hIndex + vIndex) * 0.5,
+                }}
+              />
+            ))
+          )}
+
+          {/* Traffic Lights */}
+          {Array.from({ length: 12 }, (_, i) => (
+            <motion.div
+              key={`traffic-light-${i}`}
+              className="absolute text-sm font-mono"
+              style={{
+                left: `${15 + (i * 8)}%`,
+                top: `${20 + (i % 4) * 20}%`,
+              }}
+              animate={{
+                color: ['#ef4444', '#eab308', '#22c55e', '#22c55e', '#eab308'],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                delay: i * 1.5,
+              }}
+            >
+              ●
+            </motion.div>
+          ))}
+
+          {/* Buildings (ASCII) */}
+          {Array.from({ length: 20 }, (_, i) => (
+            <div
+              key={`building-${i}`}
+              className="absolute text-xs font-mono text-slate-400/50 leading-tight"
+              style={{
+                left: `${5 + (i * 4.5)}%`,
+                top: `${10 + (i % 3) * 30}%`,
+                width: '20px',
+              }}
+            >
+              <motion.div
+                animate={{
+                  opacity: [0.4, 0.7, 0.4],
+                }}
+                transition={{
+                  duration: 6 + seeded(i * 5 + 1) * 4,
+                  repeat: Infinity,
+                  delay: seeded(i * 5 + 2) * 3,
+                }}
+              >
+                <div>┌─┐</div>
+                <div>│ │</div>
+                <div>│ │</div>
+                <div>└─┘</div>
+              </motion.div>
+            </div>
+          ))}
+
+          {/* Highway Signs */}
+          {Array.from({ length: 6 }, (_, i) => (
+            <motion.div
+              key={`sign-${i}`}
+              className="absolute text-xs font-mono text-slate-300"
+              style={{
+                left: `${20 + i * 15}%`,
+                top: `${8 + (i % 2) * 35}%`,
+              }}
+              animate={{
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                delay: i * 2,
+              }}
+            >
+                <div className="bg-yellow-400/15 px-1 py-0.5 rounded text-[10px]">
+                {['DATA ST', 'ML AVE', 'AI BLVD', 'TECH HWY', 'CODE ST', 'ALGO RD'][i]}
+              </div>
+            </motion.div>
+          ))}
+
+          {/* Emergency Vehicles */}
+          {Array.from({ length: 3 }, (_, i) => (
+            <motion.div
+              key={`emergency-${i}`}
+              className="absolute text-sm font-mono text-red-500"
+              style={{
+                top: `${25 + i * 25}%`,
+              }}
+              animate={{
+                x: ['-50px', '100vw'],
+                opacity: [0, 1, 1, 1, 0],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                delay: i * 8 + seeded(i * 7 + 1) * 10,
+                ease: "easeInOut",
+              }}
+            >
+              🚑
+            </motion.div>
+          ))}
+
+          {/* Data Flow Streams (representing network traffic) — warm accent yellow
+              on the clarity side, matching CLARITY + the Let's Connect CTA. */}
+          <motion.div
+            className="absolute inset-0"
             style={{
-              width: `${50 + (i % 3) * 16}%`,
-              height: i % 2 === 0 ? 1.5 : 3,
-              left: `${(i * 13) % 42}%`,
-              top: `${8 + ((i * 17) % 82)}%`,
-              transform: `rotate(${[-38, 22, 44, -24, 15, 31, -46, 27, -15][i]}deg)`,
-              opacity: 0.38,
+              background: `repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(250, 204, 21, 0.04) 10px,
+                rgba(250, 204, 21, 0.04) 20px
+              )`,
             }}
-          />
-        ))}
-
-        {/* Erratic traffic: little cars darting in every direction */}
-        {Array.from({ length: 16 }, (_, i) => (
-          <motion.span
-            key={`erratic-${i}`}
-            className="absolute text-xs font-mono"
-            style={{ left: `${(i * 7) % 52}%`, top: `${(i * 13) % 94}%` }}
             animate={{
-              x: [0, (seeded(i * 31 + 1) - 0.5) * 160, (seeded(i * 31 + 2) - 0.5) * 160],
-              y: [0, (seeded(i * 31 + 3) - 0.5) * 160, (seeded(i * 31 + 4) - 0.5) * 160],
-              opacity: [0, 1, 0.2, 0],
-              rotate: [0, (seeded(i * 31 + 5) - 0.5) * 260, 0],
+              backgroundPosition: ['0px 0px', '40px 40px'],
             }}
             transition={{
-              duration: 1.2 + seeded(i * 31 + 6) * 2,
+              duration: 34,
               repeat: Infinity,
-              delay: seeded(i * 31 + 7) * 2.5,
-              ease: 'easeInOut',
+              ease: "linear",
             }}
-          >
-            <span
-              className={['text-red-400', 'text-red-500', 'text-slate-400', 'text-slate-500'][i % 4]}
-            >
-              {['→', '←', '↑', '↓', '↗', '↘', '↖', '↙', '⇄', '⟲'][i % 10]}
-            </span>
-          </motion.span>
-        ))}
+          />
+        </div>
 
-        {/* Congestion hotspots: pulsing jam clusters */}
-        {Array.from({ length: 5 }, (_, c) =>
-          Array.from({ length: 5 }, (_, d) => (
-            <motion.span
-              key={`jam-${c}-${d}`}
-              className="absolute w-1.5 h-1.5 rounded-full"
+        {/* CHAOS layer (left): tangled roads, erratic traffic, congestion & spinning glyphs */}
+        <div
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, black 0%, black 48%, transparent 66%)',
+            maskImage: 'linear-gradient(to right, black 0%, black 48%, transparent 66%)',
+          }}
+        >
+          {/* Tangled, diagonal roads */}
+          {Array.from({ length: 9 }, (_, i) => (
+            <div
+              key={`tangle-${i}`}
+              className="absolute bg-white/10"
               style={{
-                left: `${6 + c * 9 + (d % 2) * 2}%`,
-                top: `${12 + c * 14 + ((d * 3) % 8)}%`,
-                backgroundColor: d % 3 === 0 ? '#f87171' : d % 3 === 1 ? '#dc2626' : '#94a3b8',
+                width: `${50 + (i % 3) * 16}%`,
+                height: i % 2 === 0 ? 1.5 : 3,
+                left: `${(i * 13) % 42}%`,
+                top: `${8 + ((i * 17) % 82)}%`,
+                transform: `rotate(${[-38, 22, 44, -24, 15, 31, -46, 27, -15][i]}deg)`,
+                opacity: 0.38,
               }}
-              animate={{ scale: [1, 1.8, 1], opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.4 + (c + d) * 0.2, repeat: Infinity, delay: (c + d) * 0.3 }}
             />
-          ))
-        )}
+          ))}
 
-        {/* Spinning glyphs (traffic / math noise) */}
-        {Array.from({ length: 6 }, (_, i) => (
-          <motion.span
-            key={`spin-${i}`}
-            className="absolute text-sm font-mono text-slate-400/70"
-            style={{ left: `${5 + ((i * 7) % 50)}%`, top: `${8 + ((i * 23) % 84)}%` }}
-            animate={{ rotate: [0, 360], opacity: [0.3, 0.9, 0.3] }}
-            transition={{ duration: 5 + (i % 4) * 3, repeat: Infinity, ease: 'linear', delay: i * 0.4 }}
-          >
-            {['⟳', '⇄', '∿', '≈', '×', '◉', '⌁', '⚡'][i]}
-          </motion.span>
-        ))}
+          {/* Erratic traffic: little cars darting in every direction */}
+          {Array.from({ length: 16 }, (_, i) => (
+            <motion.span
+              key={`erratic-${i}`}
+              className="absolute text-xs font-mono"
+              style={{ left: `${(i * 7) % 52}%`, top: `${(i * 13) % 94}%` }}
+              animate={{
+                x: [0, (seeded(i * 31 + 1) - 0.5) * 160, (seeded(i * 31 + 2) - 0.5) * 160],
+                y: [0, (seeded(i * 31 + 3) - 0.5) * 160, (seeded(i * 31 + 4) - 0.5) * 160],
+                opacity: [0, 1, 0.2, 0],
+                rotate: [0, (seeded(i * 31 + 5) - 0.5) * 260, 0],
+              }}
+              transition={{
+                duration: 1.2 + seeded(i * 31 + 6) * 2,
+                repeat: Infinity,
+                delay: seeded(i * 31 + 7) * 2.5,
+                ease: 'easeInOut',
+              }}
+            >
+              <span
+                className={['text-red-400', 'text-red-500', 'text-slate-400', 'text-slate-500'][i % 4]}
+              >
+                {['→', '←', '↑', '↓', '↗', '↘', '↖', '↙', '⇄', '⟲'][i % 10]}
+              </span>
+            </motion.span>
+          ))}
 
-        {/* Collision / warning flashes */}
-        {Array.from({ length: 3 }, (_, i) => (
-          <motion.span
-            key={`warn-${i}`}
-            className="absolute text-xs font-mono"
-            style={{ left: `${6 + i * 12}%`, top: `${20 + (i % 2) * 55}%` }}
-            animate={{ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }}
-            transition={{ duration: 2 + i * 0.4, repeat: Infinity, delay: i * 0.8 }}
-          >
-            <span className="text-red-400">⚠</span>
-          </motion.span>
-        ))}
-      </div>
+          {/* Congestion hotspots: pulsing jam clusters */}
+          {Array.from({ length: 5 }, (_, c) =>
+            Array.from({ length: 5 }, (_, d) => (
+              <motion.span
+                key={`jam-${c}-${d}`}
+                className="absolute w-1.5 h-1.5 rounded-full"
+                style={{
+                  left: `${6 + c * 9 + (d % 2) * 2}%`,
+                  top: `${12 + c * 14 + ((d * 3) % 8)}%`,
+                  backgroundColor: d % 3 === 0 ? '#f87171' : d % 3 === 1 ? '#dc2626' : '#94a3b8',
+                }}
+                animate={{ scale: [1, 1.8, 1], opacity: [0.4, 1, 0.4] }}
+                transition={{ duration: 1.4 + (c + d) * 0.2, repeat: Infinity, delay: (c + d) * 0.3 }}
+              />
+            ))
+          )}
 
-      {/* Fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        {/* Chaos fireflies — erratic darting, flickering, mixed colours */}
-        {Array.from({ length: 26 }, (_, i) => (
-          <span
-            key={`ff-chaos-${i}`}
-            className="firefly firefly--chaos"
-            style={
-              {
-                left: `${seeded(i * 3 + 1) * 46}%`,
-                top: `${6 + seeded(i * 3 + 2) * 86}%`,
-                width: `${2 + seeded(i * 5 + 1) * 3.5}px`,
-                height: `${2 + seeded(i * 5 + 2) * 3.5}px`,
-                '--ff-color': ['#f87171', '#ef4444', '#fca5a5', '#94a3b8', '#64748b', '#dc2626'][i % 6],
-                '--dur': `${5 + seeded(i * 7 + 1) * 6}s`,
-                '--delay': `${-seeded(i * 11 + 1) * 10}s`,
-                '--c1x': `${(seeded(i * 13 + 1) - 0.5) * 150}px`,
-                '--c1y': `${(seeded(i * 13 + 2) - 0.5) * 150}px`,
-                '--c2x': `${(seeded(i * 13 + 3) - 0.5) * 150}px`,
-                '--c2y': `${(seeded(i * 13 + 4) - 0.5) * 150}px`,
-                '--c3x': `${(seeded(i * 17 + 1) - 0.5) * 170}px`,
-                '--c3y': `${(seeded(i * 17 + 2) - 0.5) * 170}px`,
-                '--c4x': `${(seeded(i * 19 + 1) - 0.5) * 160}px`,
-                '--c4y': `${(seeded(i * 19 + 2) - 0.5) * 160}px`,
-                '--c5x': `${(seeded(i * 23 + 1) - 0.5) * 150}px`,
-                '--c5y': `${(seeded(i * 23 + 2) - 0.5) * 150}px`,
-                '--c6x': `${(seeded(i * 29 + 1) - 0.5) * 160}px`,
-                '--c6y': `${(seeded(i * 29 + 2) - 0.5) * 160}px`,
-              } as CSSProperties
-            }
-          />
-        ))}
+          {/* Spinning glyphs (traffic / math noise) */}
+          {Array.from({ length: 6 }, (_, i) => (
+            <motion.span
+              key={`spin-${i}`}
+              className="absolute text-sm font-mono text-slate-400/70"
+              style={{ left: `${5 + ((i * 7) % 50)}%`, top: `${8 + ((i * 23) % 84)}%` }}
+              animate={{ rotate: [0, 360], opacity: [0.3, 0.9, 0.3] }}
+              transition={{ duration: 5 + (i % 4) * 3, repeat: Infinity, ease: 'linear', delay: i * 0.4 }}
+            >
+              {['⟳', '⇄', '∿', '≈', '×', '◉', '⌁', '⚡'][i]}
+            </motion.span>
+          ))}
 
-        {/* Clarity fireflies — even columns, smooth upward drift, wave-staggered */}
-        {Array.from({ length: 18 }, (_, i) => (
-          <span
-            key={`ff-clear-${i}`}
-            className="firefly firefly--clear"
-            style={
-              {
-                left: `${54 + (i % 6) * 7 + (i % 3) * 0.8}%`,
-                top: `${4 + i * 5.2}%`,
-                width: '3px',
-                height: '3px',
-                color: '#fde68a',
-                '--dur': `${8 + (i % 4) * 1.2}s`,
-                '--delay': `${-i * 0.55}s`,
-                '--sway': `${6 + (i % 3) * 4}px`,
-                '--rise': `${-(120 + (i % 5) * 30)}px`,
-                '--peak': `${0.55 + (i % 3) * 0.15}`,
-              } as CSSProperties
-            }
-          />
-        ))}
-      </div>
+          {/* Collision / warning flashes */}
+          {Array.from({ length: 3 }, (_, i) => (
+            <motion.span
+              key={`warn-${i}`}
+              className="absolute text-xs font-mono"
+              style={{ left: `${6 + i * 12}%`, top: `${20 + (i % 2) * 55}%` }}
+              animate={{ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }}
+              transition={{ duration: 2 + i * 0.4, repeat: Infinity, delay: i * 0.8 }}
+            >
+              <span className="text-red-400">⚠</span>
+            </motion.span>
+          ))}
+        </div>
 
-      {/* Traffic dots: scatter/jitter violently near "chaos", then snap into a
-          tidy grid near "clarity". Driven by --hero-order (0→1) set on the hero
-          section by HeroLetters' scroll timeline — same narrative as the text. */}
-      <div className="hero-dots" aria-hidden="true">
-        {Array.from({ length: 24 }, (_, i) => {
-          const col = i % 6
-          const row = Math.floor(i / 6)
-          return (
+        {/* Fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {/* Chaos fireflies — erratic darting, flickering, mixed colours */}
+          {Array.from({ length: 26 }, (_, i) => (
             <span
-              key={`dot-${i}`}
-              className="hero-dot"
+              key={`ff-chaos-${i}`}
+              className="firefly firefly--chaos"
               style={
                 {
-                  '--gx': `${54 + col * 7.5}`,
-                  '--gy': `${9 + row * 22}`,
-                  '--cx': `${Math.round((seeded(i * 2 + 1) - 0.5) * 340)}px`,
-                  '--cy': `${Math.round((seeded(i * 2 + 2) - 0.5) * 340)}px`,
-                  '--jx': `${Math.round((seeded(i * 2 + 3) - 0.5) * 30)}px`,
-                  '--jy': `${Math.round((seeded(i * 2 + 4) - 0.5) * 30)}px`,
-                  '--dur': `${2.2 + seeded(i * 7) * 2}s`,
-                  '--delay': `${seeded(i * 13) * 3}s`,
-                  fontSize: `${11 + seeded(i * 17) * 5}px`,
+                  left: `${seeded(i * 3 + 1) * 46}%`,
+                  top: `${6 + seeded(i * 3 + 2) * 86}%`,
+                  width: `${2 + seeded(i * 5 + 1) * 3.5}px`,
+                  height: `${2 + seeded(i * 5 + 2) * 3.5}px`,
+                  '--ff-color': ['#f87171', '#ef4444', '#fca5a5', '#94a3b8', '#64748b', '#dc2626'][i % 6],
+                  '--dur': `${5 + seeded(i * 7 + 1) * 6}s`,
+                  '--delay': `${-seeded(i * 11 + 1) * 10}s`,
+                  '--c1x': `${(seeded(i * 13 + 1) - 0.5) * 150}px`,
+                  '--c1y': `${(seeded(i * 13 + 2) - 0.5) * 150}px`,
+                  '--c2x': `${(seeded(i * 13 + 3) - 0.5) * 150}px`,
+                  '--c2y': `${(seeded(i * 13 + 4) - 0.5) * 150}px`,
+                  '--c3x': `${(seeded(i * 17 + 1) - 0.5) * 170}px`,
+                  '--c3y': `${(seeded(i * 17 + 2) - 0.5) * 170}px`,
+                  '--c4x': `${(seeded(i * 19 + 1) - 0.5) * 160}px`,
+                  '--c4y': `${(seeded(i * 19 + 2) - 0.5) * 160}px`,
+                  '--c5x': `${(seeded(i * 23 + 1) - 0.5) * 150}px`,
+                  '--c5y': `${(seeded(i * 23 + 2) - 0.5) * 150}px`,
+                  '--c6x': `${(seeded(i * 29 + 1) - 0.5) * 160}px`,
+                  '--c6y': `${(seeded(i * 29 + 2) - 0.5) * 160}px`,
                 } as CSSProperties
               }
-            >
-              {['▪', '▫', '□', '■', '∙'][i % 5]}
-            </span>
-          )
-        })}
-      </div>
-      </div>
+            />
+          ))}
+
+          {/* Clarity fireflies — even columns, smooth upward drift, wave-staggered */}
+          {Array.from({ length: 18 }, (_, i) => (
+            <span
+              key={`ff-clear-${i}`}
+              className="firefly firefly--clear"
+              style={
+                {
+                  left: `${54 + (i % 6) * 7 + (i % 3) * 0.8}%`,
+                  top: `${4 + i * 5.2}%`,
+                  width: '3px',
+                  height: '3px',
+                  color: '#fde68a',
+                  '--dur': `${8 + (i % 4) * 1.2}s`,
+                  '--delay': `${-i * 0.55}s`,
+                  '--sway': `${6 + (i % 3) * 4}px`,
+                  '--rise': `${-(120 + (i % 5) * 30)}px`,
+                  '--peak': `${0.55 + (i % 3) * 0.15}`,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </div>
+
+        {/* Traffic dots: scatter/jitter violently near "chaos", then snap into a
+            tidy grid near "clarity". Driven by --hero-order (0→1) set on the hero
+            section by HeroLetters' scroll timeline — same narrative as the text. */}
+        <div className="hero-dots" aria-hidden="true">
+          {Array.from({ length: 24 }, (_, i) => {
+            const col = i % 6
+            const row = Math.floor(i / 6)
+            return (
+              <span
+                key={`dot-${i}`}
+                className="hero-dot"
+                style={
+                  {
+                    '--gx': `${54 + col * 7.5}`,
+                    '--gy': `${9 + row * 22}`,
+                    '--cx': `${Math.round((seeded(i * 2 + 1) - 0.5) * 340)}px`,
+                    '--cy': `${Math.round((seeded(i * 2 + 2) - 0.5) * 340)}px`,
+                    '--jx': `${Math.round((seeded(i * 2 + 3) - 0.5) * 30)}px`,
+                    '--jy': `${Math.round((seeded(i * 2 + 4) - 0.5) * 30)}px`,
+                    '--dur': `${2.2 + seeded(i * 7) * 2}s`,
+                    '--delay': `${seeded(i * 13) * 3}s`,
+                    fontSize: `${11 + seeded(i * 17) * 5}px`,
+                  } as CSSProperties
+                }
+              >
+                {['▪', '▫', '□', '■', '∙'][i % 5]}
+              </span>
+            )
+          })}
+        </div>
+        </div>
+      )}
 
       {/* Top scrim — a soft gradient behind the fixed nav so the links stay
           legible no matter which animated layer drifts under them. */}
@@ -814,11 +837,13 @@ export default function Hero() {
             {ui.nav.scrollCue}
           </span>
           <span className="relative h-12 w-px overflow-hidden bg-white/25">
-            <motion.span
-              className="absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-transparent via-yellow-200 to-transparent"
-              animate={{ y: [-24, 48] }}
-              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-            />
+            {heroActive && (
+              <motion.span
+                className="absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-transparent via-yellow-200 to-transparent"
+                animate={{ y: [-24, 48] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            )}
           </span>
         </div>
       </motion.div>

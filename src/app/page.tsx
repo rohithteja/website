@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Hero from '@/components/Hero'
 import About from '@/components/About'
@@ -15,14 +14,6 @@ import CustomCursor from '@/components/CustomCursor'
 import RiverCurve from '@/components/RiverCurve'
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
   return (
     <main className="relative isolate min-h-screen bg-gray-50">
       <CustomCursor />

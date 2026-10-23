@@ -17,16 +17,20 @@ gsap.registerPlugin(ScrollTrigger)
 // pixel: dim slate in the shadow side → warm "clarity gold" where lit,
 // so the piece reads like it belongs to the chaos→clarity hero.
 //
-// Scatter behaviour mirrors src/components/HeroLetters.tsx: every glyph
-// carries a data-speed (0.8–1.5) + rotation and drifts by
-// (1 - speed) * ScrollTrigger.maxScroll(window) across the first viewport.
-// One tween drives all glyphs (same scrub/ease as the headline letters).
+// The grid paints into a single <canvas> instead of ~3k glyph spans, and the
+// scroll drift is one GSAP tween on that one element — same scrub/ease/trigger
+// as the headline letters, but rigid instead of per-glyph.
 // -------------------------------------------------------------------
 
 const RAMP = ' .:-=+*#%@'
 const COLS = 60
 const GLYPH_HW = 1 / 0.6 // monospace glyph height ÷ width (font-mono advance ≈ 0.6em)
 const SRC = '/ascii/portrait.jpg'
+
+// Single-element substitute for the old per-glyph scatter: one speed/rotation
+// in the same numeric range the glyphs used (they ran 0.8–1.5 and ±30°).
+const DRIFT_SPEED = 1.12
+const DRIFT_ROTATION = -6
 
 type Cell = { ch: string; c: string; o: number }
 
@@ -140,10 +144,56 @@ async function rasterize(cols: number): Promise<Cell[][]> {
   return grid
 }
 
+// Draw the glyph grid into one canvas, sized from the CSS font-size so the
+// responsive `.hero-portrait` breakpoints keep scaling it exactly as before.
+function paint(canvas: HTMLCanvasElement, grid: Cell[][]) {
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  const cs = getComputedStyle(canvas)
+  const fontSize = parseFloat(cs.fontSize) || 10
+  const lineHeight = parseFloat(cs.lineHeight) || fontSize
+  const font = `${fontSize}px ${cs.fontFamily}`
+
+  ctx.font = font
+  const cellW = ctx.measureText('M').width || fontSize * 0.6
+
+  const rows = grid.length
+  let cols = 0
+  for (const line of grid) cols = Math.max(cols, line.length)
+
+  const w = cols * cellW
+  const h = rows * lineHeight
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+
+  canvas.style.width = `${w}px`
+  canvas.style.height = `${h}px`
+  canvas.width = Math.round(w * dpr)
+  canvas.height = Math.round(h * dpr)
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  ctx.clearRect(0, 0, w, h)
+  ctx.font = font
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'top'
+
+  for (let r = 0; r < rows; r++) {
+    const line = grid[r]
+    const y = r * lineHeight
+    for (let c = 0; c < line.length; c++) {
+      const cell = line[c]
+      if (cell.o === 0) continue
+      ctx.globalAlpha = cell.o
+      ctx.fillStyle = cell.c
+      ctx.fillText(cell.ch, c * cellW, y)
+    }
+  }
+  ctx.globalAlpha = 1
+}
+
 export default function AsciiPortrait() {
-  const rootRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [grid, setGrid] = useState<Cell[][] | null>(null)
-  const scatteredRef = useRef(false)
 
   // Build the glyph grid once (client-only). No ref guard here — under
   // StrictMode dev the first effect run is cancelled by its own cleanup, so
@@ -160,56 +210,66 @@ export default function AsciiPortrait() {
     }
   }, [])
 
-  // Scatter each glyph exactly like the headline letters once the grid paints.
+  // Paint into the single canvas, and re-paint when the responsive font-size
+  // steps change (viewport resize) or the monospace face finishes loading.
   useEffect(() => {
-    const root = rootRef.current
-    if (!grid || !root || scatteredRef.current) return
-    scatteredRef.current = true
+    const canvas = canvasRef.current
+    if (!grid || !canvas) return
 
-    const chars = Array.from(root.querySelectorAll<HTMLElement>('.ascii-char'))
-    if (!chars.length) return
+    let frame = 0
+    const draw = () => {
+      frame = 0
+      paint(canvas, grid)
+    }
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(draw)
+    }
 
-    chars.forEach((el) => {
-      el.dataset.speed = (0.8 + Math.random() * 0.7).toFixed(3)
-      el.dataset.r = (Math.random() * 60 - 30).toFixed(2)
-    })
+    draw()
+    window.addEventListener('resize', schedule)
+    document.fonts?.ready.then(schedule).catch(() => {})
 
-    gsap.to(chars, {
-      y: (_i, t) => (1 - parseFloat(t.dataset.speed || '1')) * ScrollTrigger.maxScroll(window),
-      rotation: (_i, t) => parseFloat(t.dataset.r || '0'),
-      ease: 'power2.out',
-      duration: 0.8,
-      scrollTrigger: {
-        trigger: document.documentElement,
-        start: 0,
-        end: window.innerHeight,
-        invalidateOnRefresh: true,
-        scrub: 0.5,
-      },
-    })
+    return () => {
+      window.removeEventListener('resize', schedule)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
   }, [grid])
 
+  // One tween, one element: the portrait drifts and tilts as a block instead of
+  // the per-glyph scatter the old span grid ran. Skipped while it's display:none.
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!grid || !canvas) return
+
+    const mm = gsap.matchMedia()
+    mm.add('(min-width: 1024px)', () => {
+      gsap.to(canvas, {
+        y: () => (1 - DRIFT_SPEED) * ScrollTrigger.maxScroll(window),
+        rotation: DRIFT_ROTATION,
+        ease: 'power2.out',
+        duration: 0.8,
+        scrollTrigger: {
+          trigger: document.documentElement,
+          start: 0,
+          end: window.innerHeight,
+          invalidateOnRefresh: true,
+          scrub: 0.5,
+        },
+      })
+    })
+
+    return () => mm.revert()
+  }, [grid])
+
+  // Nothing until the grid is ready — an unpainted canvas would otherwise
+  // reserve its default 300×150 box in the hero's river gap.
   if (!grid) return null
 
   return (
-    <div
-      ref={rootRef}
+    <canvas
+      ref={canvasRef}
       aria-hidden="true"
-      className="ascii-portrait font-mono leading-none select-none pointer-events-none"
-    >
-      {grid.map((line, ri) => (
-        <div key={ri} className="flex">
-          {line.map((cell, ci) => (
-            <span
-              key={ci}
-              className="ascii-char"
-              style={{ color: cell.c, opacity: cell.o }}
-            >
-              {cell.ch}
-            </span>
-          ))}
-        </div>
-      ))}
-    </div>
+      className="ascii-portrait block font-mono leading-none select-none pointer-events-none"
+    />
   )
 }

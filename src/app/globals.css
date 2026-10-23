@@ -138,10 +138,11 @@ body {
 .turning-beam::after {
   content: '';
   position: absolute;
-  inset-inline: 0;
-  top: -24px;
-  height: 24px;
-  background: linear-gradient(
+  inset: 0;
+  /* The box spans the whole hairline so a percentage translate resolves against
+     the rail's height: the 24px band rides it top-to-bottom on the compositor,
+     instead of animating `top` and relaying out the rail on every frame. */
+  background-image: linear-gradient(
     to bottom,
     transparent,
     #fde047 30%,
@@ -149,12 +150,15 @@ body {
     #fde047 70%,
     transparent
   );
-  box-shadow: 0 0 9px rgba(253, 224, 71, 0.8);
+  background-size: 100% 24px;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 0 8px rgba(253, 224, 71, 0.8));
   animation: turning-beam 3.2s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 @keyframes turning-beam {
   0% {
-    top: -24px;
+    transform: translateY(-24px);
     opacity: 0;
   }
   18%,
@@ -162,7 +166,7 @@ body {
     opacity: 1;
   }
   100% {
-    top: 100%;
+    transform: translateY(100%);
     opacity: 0;
   }
 }
@@ -170,8 +174,16 @@ body {
   .turning-beam::after {
     animation: none;
     opacity: 0.85;
-    top: 55%;
+    transform: translateY(calc(55% - 12px));
   }
+}
+/* The marquee and the "turning" beam loop in CSS rather than through
+   framer-motion, so they are paused separately: Hero.tsx flips
+   data-hero-active from an IntersectionObserver once the hero leaves the
+   viewport. */
+[data-hero-active='false'] .animate-scroll,
+[data-hero-active='false'] .turning-beam::after {
+  animation-play-state: paused;
 }
 @media (min-width: 1024px) {
   .turning-rail {
@@ -258,14 +270,8 @@ body {
   }
 }
 
-/* ASCII portrait (src/components/AsciiPortrait.tsx) — each glyph is one
-   monospace cell of the hero's letter-collision scatter. */
-.ascii-char {
-  width: 1ch;
-  flex: none;
-  white-space: pre;
-  will-change: transform;
-}
+/* ASCII portrait (src/components/AsciiPortrait.tsx) — the glyph grid paints
+   into one <canvas>, so there's no per-glyph styling here anymore. */
 
 /* Hero fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side.
    Pure CSS — each particle gets its motion via CSS custom properties, so no JS ticker needed. */
@@ -384,7 +390,7 @@ body {
   opacity: 0.82;
   text-shadow: 0 0 9px currentColor;
   animation: hero-dot-jitter var(--dur, 3s) var(--delay, 0s) ease-in-out infinite;
-  will-change: transform, left, top;
+  will-change: transform;
 }
 
 @keyframes hero-dot-jitter {
@@ -439,9 +445,19 @@ body {
 
 /* Page river (src/components/RiverCurve.tsx): a soft pulse travels down each
    strand of the helix. Both beam layers use pathLength=1, so the dash offsets
-   are normalized. */
+   are normalized. The pulses — and the blurred glow behind them — only run
+   while the page is scrolling (`river-active`); at rest they freeze and the
+   glow falls back to its bare low-opacity stroke, which reads the same without
+   the cost of rasterizing a full-page filter. */
 .river-beam {
   animation: river-flow 30s linear infinite;
+  animation-play-state: paused;
+}
+.river-active .river-beam {
+  animation-play-state: running;
+}
+.river-active .river-beam--glow {
+  filter: url(#river-glow);
 }
 @keyframes river-flow {
   from {
@@ -464,5 +480,8 @@ body {
   }
   .river-beam--alt {
     display: none;
+  }
+  .river-beam--glow {
+    filter: url(#river-glow);
   }
 }

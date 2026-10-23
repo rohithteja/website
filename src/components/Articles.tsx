@@ -74,7 +74,7 @@ export default function Articles() {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     quality={75}
-                    sizes="(max-width: 640px) 78vw, (max-width: 1024px) 46vw, 340px"
+                    sizes="(max-width: 461px) 78vw, (max-width: 639px) 360px, (max-width: 782px) 46vw, (max-width: 1023px) 360px, 340px"
                     priority={index < 3}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>

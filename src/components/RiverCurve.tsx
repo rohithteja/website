@@ -428,7 +428,19 @@ export default function RiverCurve() {
       spinFrame = window.requestAnimationFrame(spin)
     }
 
+    // The travelling beams (and their blurred glow) only animate while the page
+    // is actually moving. `river-active` drives that from globals.css; it is
+    // dropped shortly after scroll events stop so an idle page rasterizes no
+    // filters and runs no animations.
+    let idleTimer = 0
+    const markScrolling = () => {
+      window.clearTimeout(idleTimer)
+      svg.classList.add('river-active')
+      idleTimer = window.setTimeout(() => svg.classList.remove('river-active'), 160)
+    }
+
     const onScroll = () => {
+      markScrolling()
       if (spinning) return
       spinning = true
       lastTime = 0
@@ -439,6 +451,7 @@ export default function RiverCurve() {
 
     return () => {
       cancelled = true
+      window.clearTimeout(idleTimer)
       window.cancelAnimationFrame(frame)
       window.cancelAnimationFrame(lateFrame)
       window.cancelAnimationFrame(spinFrame)
@@ -572,7 +585,6 @@ export default function RiverCurve() {
                   strokeWidth={4.5}
                   strokeLinecap="round"
                   opacity={0.12}
-                  filter="url(#river-glow)"
                 />
 
                 {/* The strand itself. */}
@@ -605,7 +617,6 @@ export default function RiverCurve() {
                         strokeLinecap="round"
                         strokeDasharray="0.01 0.99"
                         opacity={0.24}
-                        filter="url(#river-glow)"
                       />
                       <path
                         className={`${beamClass} river-beam--core`}
