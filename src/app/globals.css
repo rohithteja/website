@@ -272,25 +272,20 @@ body {
   }
 }
 
-/* ASCII portrait (src/components/AsciiPortrait.tsx): one grid cell per glyph,
-   positioned by the component's inline grid-column/row. The scroll timeline
-   writes `--portrait-progress` / `--portrait-drift` on the container once per
-   frame; each glyph resolves its own scatter from those plus the speed
-   (`--glyph-k`) and tilt (`--glyph-rot`) it was given on mount. */
-.ascii-portrait {
-  display: grid;
-  grid-auto-rows: 1em;
-  --portrait-progress: 0;
-  --portrait-drift: 0px;
-}
-.ascii-char {
-  transform: translate3d(0, calc(var(--portrait-drift) * var(--glyph-k, 0)), 0)
-    rotate(calc(var(--glyph-rot, 0deg) * var(--portrait-progress)));
-}
-@media (prefers-reduced-motion: reduce) {
-  .ascii-char {
-    transform: none;
-  }
+/* ASCII portrait (src/components/AsciiPortrait.tsx): the glyphs are painted
+   into one viewport-sized canvas, so a scroll frame costs a few hundred
+   sprite blits instead of a style recalc plus repaint of a thousand spans.
+   The canvas is fixed to the viewport — glyphs scatter across the hero the
+   same way the headline letters do — while the wrapper keeps the portrait's
+   layout box. The component clips to the hero section itself. */
+.ascii-portrait-canvas {
+  position: fixed;
+  inset: 0;
+  /* The backing store is sized to the viewport in JS; these keep the CSS box
+     on the viewport too instead of falling back to the bitmap's pixel size. */
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* Hero fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side.
