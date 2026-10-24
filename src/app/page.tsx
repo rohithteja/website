@@ -11,7 +11,6 @@ import Publications from '@/components/Publications'
 import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import CustomCursor from '@/components/CustomCursor'
-import RiverCurve from '@/components/RiverCurve'
 
 export default function Home() {
   return (
@@ -33,8 +32,6 @@ export default function Home() {
         <Contact />
         <Footer />
       </motion.div>
-
-      <RiverCurve />
     </main>
   )
 }

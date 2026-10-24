@@ -85,8 +85,8 @@ export default function Hero() {
       data-hero-active={heroActive}
       className="section-backdrop section-backdrop-hero relative min-h-screen flow-root overflow-clip"
     >
-      {/* Hero atmosphere. Sits on its own negative layer so the page-wide river
-          thread can pass above it while every hero element stays above the thread.
+      {/* Hero atmosphere. Sits on its own negative layer so every hero element
+          stays above it.
           Every loop in here is a CSS animation, so `data-hero-active` (see the
           IntersectionObserver above) freezes them with `animation-play-state`
           instead of unmounting the layer. The whole atmosphere keeps its nodes:

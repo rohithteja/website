@@ -109,7 +109,7 @@ export default function Work() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
 
-        <div className="mb-8" data-river-avoid>
+        <div className="mb-8">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-white leading-none mb-8">
           {ui.work.heading}
           </h1>

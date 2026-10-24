@@ -26,7 +26,6 @@ export default function About() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="mb-16"
-          data-river-avoid
         >
           <h1 className="text-5xl md:text-8xl lg:text-9xl font-light text-black leading-none mb-8">
             <motion.span
@@ -52,7 +51,7 @@ export default function About() {
         >
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2">
-            <div className="text-lg text-gray-800 space-y-6 leading-relaxed" data-river-avoid>
+            <div className="text-lg text-gray-800 space-y-6 leading-relaxed">
               <p className="text-2xl font-light text-black">{bio.intro}</p>
               {bio.body.map((paragraph, i) => (
                 <p key={i}>{paragraph}</p>
@@ -60,7 +59,7 @@ export default function About() {
             </div>
 
             {/* Skills/Interests */}
-            <div className="mt-12 pt-8 border-t border-gray-200" data-river-avoid>
+            <div className="mt-12 pt-8 border-t border-gray-200">
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4">
@@ -106,7 +105,7 @@ export default function About() {
               </div>
 
               {/* Quick Info */}
-              <div className="space-y-6" data-river-avoid>
+              <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
                     {ui.about.labels.currently}

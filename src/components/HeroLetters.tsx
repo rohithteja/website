@@ -130,7 +130,6 @@ export default function HeroLetters() {
       className="ml-8 scroll-smooth relative z-10 select-none pointer-events-none"
       role="img"
       aria-label={ui.hero.ariaLabel}
-      data-river-gap-left
     >
       <div className="relative -mt-28 mb-36 flex h-screen flex-col justify-end lg:mb-24">
         {/* Eyebrow — kept above the headline on small screens, where the ASCII
@@ -168,9 +167,8 @@ export default function HeroLetters() {
 
         {/* ASCII portrait — floats in the clear space to the right of the headline,
             shares its scroll scatter (no backdrop so the glyphs sit on the hero).
-            The name/role caption sits beneath it on desktop. `data-river-gap`
-            tells the page river to thread the gap to its left, not the glyphs. */}
-        <div className="hero-portrait absolute z-0" data-river-gap>
+            The name/role caption sits beneath it on desktop. */}
+        <div className="hero-portrait absolute z-0">
           <AsciiPortrait />
           <div className="mx-auto mt-4 flex w-0 items-center justify-center gap-3 whitespace-nowrap">
             <span className="h-px w-10 bg-gradient-to-r from-yellow-400/80 to-transparent" />

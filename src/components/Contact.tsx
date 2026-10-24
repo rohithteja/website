@@ -16,7 +16,7 @@ export default function Contact() {
         }}
       />
 
-      <div className="max-w-4xl mx-auto text-center relative" data-river-avoid>
+      <div className="max-w-4xl mx-auto text-center relative">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}

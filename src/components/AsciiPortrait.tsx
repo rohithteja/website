@@ -2,7 +2,7 @@
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,20 +17,18 @@ gsap.registerPlugin(ScrollTrigger)
 // pixel: dim slate in the shadow side → warm "clarity gold" where lit,
 // so the piece reads like it belongs to the chaos→clarity hero.
 //
-// The grid paints into a single <canvas> instead of ~3k glyph spans, and the
-// scroll drift is one GSAP tween on that one element — same scrub/ease/trigger
-// as the headline letters, but rigid instead of per-glyph.
+// Every glyph is one CSS grid cell carrying its own speed (0.8–1.5) and tilt
+// (±30°) — the same numbers the headline letters use, so the portrait tears
+// apart with them. The scroll timeline only writes two custom properties on the
+// root (`--portrait-progress`, `--portrait-drift`) and each glyph resolves its
+// own transform from those, which is a single style write per frame instead of
+// one per glyph.
 // -------------------------------------------------------------------
 
 const RAMP = ' .:-=+*#%@'
 const COLS = 60
 const GLYPH_HW = 1 / 0.6 // monospace glyph height ÷ width (font-mono advance ≈ 0.6em)
 const SRC = '/ascii/portrait.jpg'
-
-// Single-element substitute for the old per-glyph scatter: one speed/rotation
-// in the same numeric range the glyphs used (they ran 0.8–1.5 and ±30°).
-const DRIFT_SPEED = 1.12
-const DRIFT_ROTATION = -6
 
 type Cell = { ch: string; c: string; o: number }
 
@@ -144,56 +142,34 @@ async function rasterize(cols: number): Promise<Cell[][]> {
   return grid
 }
 
-// Draw the glyph grid into one canvas, sized from the CSS font-size so the
-// responsive `.hero-portrait` breakpoints keep scaling it exactly as before.
-function paint(canvas: HTMLCanvasElement, grid: Cell[][]) {
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
+type Glyph = {
+  key: string
+  ch: string
+  color: string
+  opacity: number
+  col: number
+  row: number
+}
 
-  const cs = getComputedStyle(canvas)
-  const fontSize = parseFloat(cs.fontSize) || 10
-  const lineHeight = parseFloat(cs.lineHeight) || fontSize
-  const font = `${fontSize}px ${cs.fontFamily}`
+// Blank cells (the ~60% of the grid that is empty space) are dropped: only the
+// glyphs themselves need a node, and only they need to be animated.
+function toGlyphs(grid: Cell[][]): Glyph[] {
+  const glyphs: Glyph[] = []
 
-  ctx.font = font
-  const cellW = ctx.measureText('M').width || fontSize * 0.6
+  grid.forEach((line, r) => {
+    line.forEach((cell, c) => {
+      if (cell.o === 0) return
+      glyphs.push({ key: `${r}:${c}`, ch: cell.ch, color: cell.c, opacity: cell.o, col: c + 1, row: r + 1 })
+    })
+  })
 
-  const rows = grid.length
-  let cols = 0
-  for (const line of grid) cols = Math.max(cols, line.length)
-
-  const w = cols * cellW
-  const h = rows * lineHeight
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
-
-  canvas.style.width = `${w}px`
-  canvas.style.height = `${h}px`
-  canvas.width = Math.round(w * dpr)
-  canvas.height = Math.round(h * dpr)
-
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-  ctx.clearRect(0, 0, w, h)
-  ctx.font = font
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'top'
-
-  for (let r = 0; r < rows; r++) {
-    const line = grid[r]
-    const y = r * lineHeight
-    for (let c = 0; c < line.length; c++) {
-      const cell = line[c]
-      if (cell.o === 0) continue
-      ctx.globalAlpha = cell.o
-      ctx.fillStyle = cell.c
-      ctx.fillText(cell.ch, c * cellW, y)
-    }
-  }
-  ctx.globalAlpha = 1
+  return glyphs
 }
 
 export default function AsciiPortrait() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
   const [grid, setGrid] = useState<Cell[][] | null>(null)
+  const glyphs = useMemo(() => (grid ? toGlyphs(grid) : []), [grid])
 
   // Build the glyph grid once (client-only). No ref guard here — under
   // StrictMode dev the first effect run is cancelled by its own cleanup, so
@@ -210,49 +186,40 @@ export default function AsciiPortrait() {
     }
   }, [])
 
-  // Paint into the single canvas, and re-paint when the responsive font-size
-  // steps change (viewport resize) or the monospace face finishes loading.
+  // Scatter each glyph exactly like the headline letters. Speeds and tilts are
+  // assigned here rather than during render so server and client markup match.
+  // Skipped entirely while the portrait is display:none (below `lg`).
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!grid || !canvas) return
+    const root = rootRef.current
+    if (!grid || !root) return
 
-    let frame = 0
-    const draw = () => {
-      frame = 0
-      paint(canvas, grid)
+    root.querySelectorAll<HTMLElement>('.ascii-char').forEach((el) => {
+      el.style.setProperty('--glyph-k', (1 - (0.8 + Math.random() * 0.7)).toFixed(3))
+      el.style.setProperty('--glyph-rot', `${(Math.random() * 60 - 30).toFixed(2)}deg`)
+    })
+
+    const progress = { value: 0 }
+    const apply = () => {
+      root.style.setProperty('--portrait-progress', progress.value.toFixed(4))
+      root.style.setProperty(
+        '--portrait-drift',
+        `${progress.value * ScrollTrigger.maxScroll(window)}px`,
+      )
     }
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(draw)
-    }
-
-    draw()
-    window.addEventListener('resize', schedule)
-    document.fonts?.ready.then(schedule).catch(() => {})
-
-    return () => {
-      window.removeEventListener('resize', schedule)
-      if (frame) window.cancelAnimationFrame(frame)
-    }
-  }, [grid])
-
-  // One tween, one element: the portrait drifts and tilts as a block instead of
-  // the per-glyph scatter the old span grid ran. Skipped while it's display:none.
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!grid || !canvas) return
 
     const mm = gsap.matchMedia()
     mm.add('(min-width: 1024px)', () => {
-      gsap.to(canvas, {
-        y: () => (1 - DRIFT_SPEED) * ScrollTrigger.maxScroll(window),
-        rotation: DRIFT_ROTATION,
+      gsap.to(progress, {
+        value: 1,
         ease: 'power2.out',
         duration: 0.8,
+        onUpdate: apply,
         scrollTrigger: {
           trigger: document.documentElement,
           start: 0,
           end: window.innerHeight,
           invalidateOnRefresh: true,
+          onRefresh: apply,
           scrub: 0.5,
         },
       })
@@ -261,15 +228,30 @@ export default function AsciiPortrait() {
     return () => mm.revert()
   }, [grid])
 
-  // Nothing until the grid is ready — an unpainted canvas would otherwise
-  // reserve its default 300×150 box in the hero's river gap.
+  // Nothing until the grid is ready, so the hero never reserves an empty box.
   if (!grid) return null
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={rootRef}
       aria-hidden="true"
-      className="ascii-portrait block font-mono leading-none select-none pointer-events-none"
-    />
+      className="ascii-portrait font-mono leading-none select-none pointer-events-none"
+      style={{ gridTemplateColumns: `repeat(${COLS}, 1ch)` }}
+    >
+      {glyphs.map((glyph) => (
+        <span
+          key={glyph.key}
+          className="ascii-char"
+          style={{
+            gridColumn: glyph.col,
+            gridRow: glyph.row,
+            color: glyph.color,
+            opacity: glyph.opacity,
+          }}
+        >
+          {glyph.ch}
+        </span>
+      ))}
+    </div>
   )
 }

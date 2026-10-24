@@ -272,8 +272,26 @@ body {
   }
 }
 
-/* ASCII portrait (src/components/AsciiPortrait.tsx) — the glyph grid paints
-   into one <canvas>, so there's no per-glyph styling here anymore. */
+/* ASCII portrait (src/components/AsciiPortrait.tsx): one grid cell per glyph,
+   positioned by the component's inline grid-column/row. The scroll timeline
+   writes `--portrait-progress` / `--portrait-drift` on the container once per
+   frame; each glyph resolves its own scatter from those plus the speed
+   (`--glyph-k`) and tilt (`--glyph-rot`) it was given on mount. */
+.ascii-portrait {
+  display: grid;
+  grid-auto-rows: 1em;
+  --portrait-progress: 0;
+  --portrait-drift: 0px;
+}
+.ascii-char {
+  transform: translate3d(0, calc(var(--portrait-drift) * var(--glyph-k, 0)), 0)
+    rotate(calc(var(--glyph-rot, 0deg) * var(--portrait-progress)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .ascii-char {
+    transform: none;
+  }
+}
 
 /* Hero fireflies: chaotic on the chaos (left) side, organized on the clarity (right) side.
    Pure CSS — each particle gets its motion via CSS custom properties, so no JS ticker needed. */
@@ -618,9 +636,9 @@ body {
   }
 }
 
-/* Section backdrops live on a negative-z pseudo-element, letting the page-wide
-   river thread (src/components/RiverCurve.tsx) pass above the background but
-   below every piece of content. */
+/* Section backdrops live on a negative-z pseudo-element so content always
+   paints above the background without each section needing its own stacking
+   context. */
 .section-backdrop {
   position: relative;
 }

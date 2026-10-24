@@ -22,7 +22,6 @@ export default function Publications() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           className="mb-8 px-6 md:px-10 lg:px-14"
-          data-river-avoid
         >
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
