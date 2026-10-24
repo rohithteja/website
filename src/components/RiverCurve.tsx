@@ -37,6 +37,10 @@ const HELIX_SPIN_PER_PX = (Math.PI * 2) / 1800
 const MIN_GUIDE_GAP = 3
 const GUIDE_MARGIN = 2
 
+// Tailwind's `md` breakpoint: the helix needs the extra width to read, and on
+// phones it only adds draw cost and visual clutter.
+const DESKTOP_QUERY = '(min-width: 768px)'
+
 const round = (value: number) => Math.round(value * 10) / 10
 
 const strandAmplitude = (width: number) => Math.min(34, Math.max(16, width * 0.03))
@@ -305,9 +309,21 @@ export default function RiverCurve() {
   const strandGroups = useRef<(SVGGElement | null)[]>([])
   const strandRef = useRef<StrandSample[]>([])
   const phaseRef = useRef(0)
+  const [isDesktop, setIsDesktop] = useState(false)
   const [geometry, setGeometry] = useState<Geometry | null>(null)
 
   useEffect(() => {
+    const query = window.matchMedia(DESKTOP_QUERY)
+    const update = () => setIsDesktop(query.matches)
+
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  useEffect(() => {
+    if (!isDesktop) return
+
     const svg = svgRef.current
     const main = svg?.closest('main')
     if (!svg || !main) return
@@ -459,7 +475,9 @@ export default function RiverCurve() {
       window.removeEventListener('resize', onResize)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [])
+  }, [isDesktop])
+
+  if (!isDesktop) return null
 
   return (
     <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
