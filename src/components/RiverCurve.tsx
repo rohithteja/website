@@ -28,10 +28,6 @@ type Geometry = {
 // One full turn of the helix every ~520px of page height, regardless of viewport.
 const HELIX_TURN_SPACING = 520
 
-// Radians the helix rotates per pixel scrolled — one full revolution every
-// ~1800px, so the strands visibly turn as the page moves without feeling frantic.
-const HELIX_SPIN_PER_PX = (Math.PI * 2) / 1800
-
 // A gap needs a couple of pixels of clearance on each side before it is worth
 // threading; below this the natural route is left alone.
 const MIN_GUIDE_GAP = 3
@@ -306,9 +302,6 @@ function smoothPath(points: Point[]): string {
 
 export default function RiverCurve() {
   const svgRef = useRef<SVGSVGElement>(null)
-  const strandGroups = useRef<(SVGGElement | null)[]>([])
-  const strandRef = useRef<StrandSample[]>([])
-  const phaseRef = useRef(0)
   const [isDesktop, setIsDesktop] = useState(false)
   const [geometry, setGeometry] = useState<Geometry | null>(null)
 
@@ -328,13 +321,7 @@ export default function RiverCurve() {
     const main = svg?.closest('main')
     if (!svg || !main) return
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    phaseRef.current = reduceMotion ? 0 : window.scrollY * HELIX_SPIN_PER_PX
-
     let frame = 0
-    let spinFrame = 0
-    let spinning = false
-    let lastTime = 0
     let cancelled = false
 
     const measure = () => {
@@ -364,15 +351,11 @@ export default function RiverCurve() {
       })
 
       const strand = buildStrand(route, width, height, guides)
-      strandRef.current = strand
 
       setGeometry({
         width,
         height,
-        paths: [
-          strandPath(strand, phaseRef.current),
-          strandPath(strand, phaseRef.current + Math.PI),
-        ],
+        paths: [strandPath(strand, 0), strandPath(strand, Math.PI)],
         start: route[0],
         end: route[route.length - 1],
         avoid,
@@ -410,70 +393,12 @@ export default function RiverCurve() {
     }
     window.addEventListener('resize', onResize)
 
-    // Turning the page rotates the helix: the scroll position becomes the sine
-    // phase, so the strands appear to spin about their axis. Paths are written
-    // straight to the DOM (state would re-render on every frame) and eased, so
-    // the motion glides to a stop shortly after scrolling ends.
-    const applySpin = () => {
-      const strand = strandRef.current
-      if (!strand.length) return
-
-      strandGroups.current.forEach((group, index) => {
-        if (!group) return
-        const d = strandPath(strand, phaseRef.current + index * Math.PI)
-        group.querySelectorAll('path').forEach((path) => path.setAttribute('d', d))
-      })
-    }
-
-    const spin = (time: number) => {
-      const dt = lastTime ? Math.min(64, time - lastTime) : 16
-      lastTime = time
-
-      const target = window.scrollY * HELIX_SPIN_PER_PX
-      const delta = target - phaseRef.current
-
-      if (Math.abs(delta) < 0.0005) {
-        phaseRef.current = target
-        applySpin()
-        spinning = false
-        return
-      }
-
-      phaseRef.current += delta * (1 - Math.exp(-dt / 60))
-      applySpin()
-      spinFrame = window.requestAnimationFrame(spin)
-    }
-
-    // The travelling beams only animate while the page is actually moving.
-    // `river-active` drives that from globals.css; it is dropped shortly after
-    // scroll events stop so an idle page runs no animations. Nothing here is
-    // filter-based, so toggling it never re-rasterizes the river.
-    let idleTimer = 0
-    const markScrolling = () => {
-      window.clearTimeout(idleTimer)
-      svg.classList.add('river-active')
-      idleTimer = window.setTimeout(() => svg.classList.remove('river-active'), 160)
-    }
-
-    const onScroll = () => {
-      markScrolling()
-      if (spinning) return
-      spinning = true
-      lastTime = 0
-      spinFrame = window.requestAnimationFrame(spin)
-    }
-
-    if (!reduceMotion) window.addEventListener('scroll', onScroll, { passive: true })
-
     return () => {
       cancelled = true
-      window.clearTimeout(idleTimer)
       window.cancelAnimationFrame(frame)
       window.cancelAnimationFrame(lateFrame)
-      window.cancelAnimationFrame(spinFrame)
       observer.disconnect()
       window.removeEventListener('resize', onResize)
-      window.removeEventListener('scroll', onScroll)
     }
   }, [isDesktop])
 
@@ -516,36 +441,6 @@ export default function RiverCurve() {
             <stop offset="62%" stopColor="#f87171" />
             <stop offset="100%" stopColor="#ef4444" />
           </linearGradient>
-          <linearGradient
-            id="river-beam-a"
-            gradientUnits="userSpaceOnUse"
-            x1={geometry?.start?.x ?? 0}
-            y1={geometry?.start?.y ?? 0}
-            x2={geometry?.end?.x ?? 1}
-            y2={geometry?.end?.y ?? 1}
-          >
-            <stop offset="0%" stopColor="#ff4d4d" />
-            <stop offset="30%" stopColor="#ff6b5e" />
-            <stop offset="48%" stopColor="#ffb340" />
-            <stop offset="64%" stopColor="#ffd43b" />
-            <stop offset="82%" stopColor="#ffe066" />
-            <stop offset="100%" stopColor="#fff3a0" />
-          </linearGradient>
-          <linearGradient
-            id="river-beam-b"
-            gradientUnits="userSpaceOnUse"
-            x1={geometry?.start?.x ?? 0}
-            y1={geometry?.start?.y ?? 0}
-            x2={geometry?.end?.x ?? 1}
-            y2={geometry?.end?.y ?? 1}
-          >
-            <stop offset="0%" stopColor="#fff3a0" />
-            <stop offset="18%" stopColor="#ffe066" />
-            <stop offset="36%" stopColor="#ffd43b" />
-            <stop offset="52%" stopColor="#ffb340" />
-            <stop offset="70%" stopColor="#ff6b5e" />
-            <stop offset="100%" stopColor="#ff4d4d" />
-          </linearGradient>
           {/* Reading copy gets a soft clearing so the thread never crosses text
               it would sit behind; cards and other boxes are left untouched. */}
           <filter id="river-avoid-soft" x="-10%" y="-10%" width="120%" height="120%">
@@ -582,12 +477,7 @@ export default function RiverCurve() {
             const tone = index === 0 ? 'a' : 'b'
 
             return (
-              <g
-                key={`strand-${tone}`}
-                ref={(el) => {
-                  strandGroups.current[index] = el
-                }}
-              >
+              <g key={`strand-${tone}`}>
                 {/* Soft halo so each strand sits in its own light. */}
                 <path
                   d={path}
@@ -609,55 +499,6 @@ export default function RiverCurve() {
                   vectorEffect="non-scaling-stroke"
                   opacity={0.62}
                 />
-
-                {/* Travelling light: two beams per strand, half a cycle apart,
-                    so a pulse passes the viewport about every 15s instead of
-                    every 30s. Each beam is a soft glow under a bright core.
-                    The glow is layered strokes rather than a Gaussian blur:
-                    a filter on the full-page path has to be re-rasterized
-                    every frame while the beam animates, which is exactly the
-                    scroll lag we were trying to avoid. */}
-                {[0, 1].map((beamIndex) => {
-                  const beamClass = `river-beam${beamIndex === 1 ? ' river-beam--alt' : ''}`
-
-                  return (
-                    <g key={`beam-${tone}-${beamIndex}`}>
-                      <path
-                        className={`${beamClass} river-beam--halo`}
-                        d={path}
-                        pathLength={1}
-                        fill="none"
-                        stroke={`url(#river-beam-${tone})`}
-                        strokeWidth={20}
-                        strokeLinecap="round"
-                        strokeDasharray="0.01 0.99"
-                        opacity={0.05}
-                      />
-                      <path
-                        className={`${beamClass} river-beam--glow`}
-                        d={path}
-                        pathLength={1}
-                        fill="none"
-                        stroke={`url(#river-beam-${tone})`}
-                        strokeWidth={10}
-                        strokeLinecap="round"
-                        strokeDasharray="0.01 0.99"
-                        opacity={0.12}
-                      />
-                      <path
-                        className={`${beamClass} river-beam--core`}
-                        d={path}
-                        pathLength={1}
-                        fill="none"
-                        stroke={`url(#river-beam-${tone})`}
-                        strokeWidth={2.4}
-                        strokeLinecap="round"
-                        strokeDasharray="0.01 0.99"
-                        opacity={0.85}
-                      />
-                    </g>
-                  )
-                })}
               </g>
             )
           })}
