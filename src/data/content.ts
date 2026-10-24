@@ -473,7 +473,7 @@ export const ui = {
     badge: 'Open to opportunities',
     heading: "let's build something",
     headingAccent: "data can't solve alone",
-    body: "I'm open to senior data scientist, AI research and energy / mobility intelligence roles. Got a messy dataset or a hard forecasting problem?",
+    body: "I'm open to senior data scientist, AI research and energy / mobility intelligence roles. Let's connect!",
     findMe: 'find me here',
   },
 
